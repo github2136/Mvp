@@ -3,7 +3,7 @@ package com.github2136.base;
 import android.support.annotation.StringRes;
 
 /**
- * view基础接口
+ *
  */
 public interface IBaseMVPView {
     // 显示进度框

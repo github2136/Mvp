@@ -23,8 +23,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
-    compileOnly 'com.github.github2136:Android-utils:37bffc4345'
-    compileOnly 'com.google.code.gson:gson:2.8.2'
+    api 'com.github.github2136:Android-utils:37bffc4345'
+    api 'com.google.code.gson:gson:2.8.2'
+    api 'com.squareup.okhttp3:okhttp:3.11.0'
 }
 // 指定编码
 tasks.withType(JavaCompile) {

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Created by yubin on 2016/2/23.
+ *
  */
 public class BaseApplication extends MultiDexApplication {
     private ArrayList<AppCompatActivity> mActivitys;

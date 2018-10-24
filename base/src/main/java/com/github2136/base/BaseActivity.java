@@ -9,7 +9,7 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by yb on 2018/9/20.
+ *
  */
 public abstract class BaseActivity<P extends BaseMVPPresenter> extends AppCompatActivity implements IBaseMVPView {
     protected P mPresenter;

@@ -1,30 +1,141 @@
 package com.github2136.base;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.ArrayMap;
 
 import com.github2136.util.JsonUtil;
 import com.github2136.util.SPUtil;
 
+import java.io.IOException;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 /**
- * model基础类
+ *
  */
 public abstract class BaseMVPModel {
+    protected OkHttpClient client;
     protected Context mContext;
-
+    protected Handler mHandler;
     protected String mTag;
     protected SPUtil mSpUtil;
     protected JsonUtil mJsonUtil;
 
-    public BaseMVPModel(Context context) {
+    public BaseMVPModel(Context context, String tag) {
         mContext = context;
-        mTag = context.getClass().getSimpleName();
+        mTag = tag;
         initMode();
     }
 
     private void initMode() {
         mJsonUtil = JsonUtil.getInstance();
         mSpUtil = SPUtil.getInstance(mContext);
+        client = new OkHttpClient();
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
-    public abstract void cancelRequest();
+    protected void httpGet(final String url,
+                           final String method,
+                           final ArrayMap<String, Object> params,
+                           final HttpCallback callback) {
+        StringBuilder urlSb = new StringBuilder(url + method);
+        if (params != null && !params.isEmpty()) {
+            urlSb.append("?");
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                urlSb.append(entry.getKey());
+                urlSb.append("=");
+                urlSb.append(entry.getValue());
+                urlSb.append("&");
+            }
+            urlSb.deleteCharAt(urlSb.length() - 1);
+        }
+        Request request = new Request.Builder()
+                .url(urlSb.toString())
+                .tag(mTag)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(final Call call, final IOException e) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onFailure(call, e);
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(final Call call, final Response response) throws IOException {
+                final String bodyStr = response.body().string();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onResponse(call, response, bodyStr);
+                    }
+                });
+            }
+        });
+    }
+
+    protected void httpPost(final String url,
+                            final String method,
+                            final ArrayMap<String, Object> params,
+                            final HttpCallback callback) {
+
+        MediaType JSON = MediaType.parse("application/json");
+        String json = "";
+        if (params != null && !params.isEmpty()) {
+            json = JsonUtil.getInstance().getGson().toJson(params);
+        }
+        RequestBody body = RequestBody.create(JSON, json);
+
+        Request request = new Request.Builder()
+                .url(url + method)
+                .tag(mTag)
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(final Call call, final IOException e) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onFailure(call, e);
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(final Call call, final Response response) throws IOException {
+                final String bodyStr = response.body().string();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onResponse(call, response, bodyStr);
+                    }
+                });
+            }
+        });
+    }
+
+    public void cancelRequest() {
+        for (Call call : client.dispatcher().queuedCalls()) {
+            if (call.request().tag().equals(mTag))
+                call.cancel();
+        }
+        for (Call call : client.dispatcher().runningCalls()) {
+            if (call.request().tag().equals(mTag))
+                call.cancel();
+        }
+    }
 }

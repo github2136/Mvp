@@ -1,5 +1,6 @@
 package com.github2136.base;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,7 @@ import com.github2136.util.SPUtil;
 import java.util.Set;
 
 /**
- * presenter基础类
+ *
  */
 public abstract class BaseMVPPresenter<V extends IBaseMVPView> {
     protected V mView;
@@ -89,6 +90,25 @@ public abstract class BaseMVPPresenter<V extends IBaseMVPView> {
 
     public void postMain(Runnable runnable) {
         mHandler.post(runnable);
+    }
+
+    /**
+     * 界面是否存在
+     *
+     * @return
+     */
+    protected boolean isViewGone() {
+        if (mFragment != null) {
+            return mFragment.isDetached();
+        } else if (mActivity != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                return mActivity.isFinishing() || mActivity.isDestroyed();
+            } else {
+                return mActivity.isFinishing();
+            }
+        } else {
+            return false;
+        }
     }
 
     //取消请求

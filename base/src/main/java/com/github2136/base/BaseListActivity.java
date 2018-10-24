@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
 
 import java.util.List;
 /**
- * Created by yb on 2017/7/18.
+ *
  */
 public abstract class BaseListActivity<T, P extends BaseMVPPresenter> extends BaseActivity<P> {
     protected RecyclerView rvContent;

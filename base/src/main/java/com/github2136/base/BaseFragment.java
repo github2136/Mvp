@@ -14,7 +14,7 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by yb on 2018/9/21.
+ *
  */
 public abstract class BaseFragment<P extends BaseMVPPresenter> extends Fragment implements IBaseMVPView {
     protected final String TAG = this.getClass().getName();
