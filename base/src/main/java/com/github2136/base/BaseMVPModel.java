@@ -25,7 +25,7 @@ import okhttp3.Response;
 public abstract class BaseMVPModel {
     protected OkHttpClient client;
     protected Context mContext;
-    protected Handler mHandler;
+
     protected String mTag;
     protected SPUtil mSpUtil;
     protected JsonUtil mJsonUtil;
@@ -40,13 +40,12 @@ public abstract class BaseMVPModel {
         mJsonUtil = JsonUtil.getInstance();
         mSpUtil = SPUtil.getInstance(mContext);
         client = new OkHttpClient();
-        mHandler = new Handler(Looper.getMainLooper());
     }
 
     protected void httpGet(final String url,
                            final String method,
                            final ArrayMap<String, Object> params,
-                           final HttpCallback callback) {
+                           Callback callback) {
         StringBuilder urlSb = new StringBuilder(url + method);
         if (params != null && !params.isEmpty()) {
             urlSb.append("?");
@@ -62,34 +61,13 @@ public abstract class BaseMVPModel {
                 .url(urlSb.toString())
                 .tag(mTag)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(final Call call, final IOException e) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onFailure(call, e);
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(final Call call, final Response response) throws IOException {
-                final String bodyStr = response.body().string();
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onResponse(call, response, bodyStr);
-                    }
-                });
-            }
-        });
+        client.newCall(request).enqueue(callback);
     }
 
     protected void httpPost(final String url,
                             final String method,
                             final ArrayMap<String, Object> params,
-                            final HttpCallback callback) {
+                            Callback callback) {
 
         MediaType JSON = MediaType.parse("application/json");
         String json = "";
@@ -104,28 +82,7 @@ public abstract class BaseMVPModel {
                 .post(body)
                 .build();
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(final Call call, final IOException e) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onFailure(call, e);
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(final Call call, final Response response) throws IOException {
-                final String bodyStr = response.body().string();
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onResponse(call, response, bodyStr);
-                    }
-                });
-            }
-        });
+        client.newCall(request).enqueue(callback);
     }
 
     public void cancelRequest() {

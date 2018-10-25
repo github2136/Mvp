@@ -3,7 +3,6 @@ package com.github2136.mvp.model;
 import android.content.Context;
 
 import com.github2136.base.BaseMVPModel;
-import com.github2136.base.HttpCallback;
 
 import okhttp3.Callback;
 
@@ -16,7 +15,7 @@ public class UserModel extends BaseMVPModel {
         super(context, tag);
     }
 
-    public void get(HttpCallback callback) {
+    public void get(Callback callback) {
         httpGet("http://www.baidu.com", "", null, callback);
     }
 }

@@ -9,7 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import com.github2136.util.JsonUtil;
 import com.github2136.util.SPUtil;
 
+import java.io.IOException;
 import java.util.Set;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  *
@@ -109,6 +114,37 @@ public abstract class BaseMVPPresenter<V extends IBaseMVPView> {
         } else {
             return false;
         }
+    }
+
+    public abstract class HttpCallback implements Callback {
+        @Override
+        public void onResponse(final Call call, final Response response) throws IOException {
+            final String bodyStr = response.body().string();
+            if (!isViewGone()) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onResponse(call, response, bodyStr);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onFailure(final Call call, final IOException e) {
+            if (!isViewGone()) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        onFailure(call, e, failedStr);
+                    }
+                });
+            }
+        }
+
+        protected abstract void onFailure(Call call, IOException e, String str);
+
+        protected abstract void onResponse(Call call, Response response, String bodyStr);
     }
 
     //取消请求
