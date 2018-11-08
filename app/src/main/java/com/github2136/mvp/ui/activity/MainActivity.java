@@ -14,7 +14,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements IMainVi
 
     @Override
     protected MainPresenter getPresenter() {
-        return new MainPresenter(this, this);
+        return new MainPresenter(this);
     }
 
     @Override

@@ -1,15 +1,13 @@
 package com.github2136.base;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.ArrayMap;
 
 import com.github2136.util.JsonUtil;
 import com.github2136.util.SPUtil;
 
-import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -17,7 +15,6 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 /**
  *
@@ -39,7 +36,12 @@ public abstract class BaseMVPModel {
     private void initMode() {
         mJsonUtil = JsonUtil.getInstance();
         mSpUtil = SPUtil.getInstance(mContext);
-        client = new OkHttpClient();
+        client = new OkHttpClient().newBuilder()
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .build();
+
     }
 
     protected void httpGet(final String url,

@@ -10,6 +10,7 @@ import com.github2136.util.JsonUtil;
 import com.github2136.util.SPUtil;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Set;
 
 import okhttp3.Call;
@@ -20,33 +21,25 @@ import okhttp3.Response;
  *
  */
 public abstract class BaseMVPPresenter<V extends IBaseMVPView> {
-    protected V mView;
-    protected AppCompatActivity mActivity;
-    protected Fragment mFragment;
+    protected WeakReference<V> vWeakReference;
     protected final String failedStr = "无法连接服务器";
     protected JsonUtil mJsonUtil;
     protected SPUtil mSpUtil;
     protected Handler mHandler;
 
-    public BaseMVPPresenter(AppCompatActivity activity, V view) {
-        mActivity = activity;
-        initPresenter(view);
+    public BaseMVPPresenter(V v) {
+        vWeakReference = new WeakReference<>(v);
+        if (v instanceof AppCompatActivity) {
+            mSpUtil = SPUtil.getInstance(((AppCompatActivity) v));
+        } else if (v instanceof Fragment) {
+            mSpUtil = SPUtil.getInstance(((Fragment) v).getContext());
+        }
+        initPresenter();
     }
 
-    public BaseMVPPresenter(Fragment fragment, V view) {
-        mFragment = fragment;
-        initPresenter(view);
-    }
-
-    private void initPresenter(V view) {
-        this.mView = view;
+    private void initPresenter() {
         mJsonUtil = JsonUtil.getInstance();
         mHandler = new Handler(Looper.getMainLooper());
-        if (mActivity == null) {
-            mSpUtil = SPUtil.getInstance(mFragment.getContext());
-        } else {
-            mSpUtil = SPUtil.getInstance(mActivity);
-        }
     }
 
     public String getSPString(String key) {
@@ -102,29 +95,36 @@ public abstract class BaseMVPPresenter<V extends IBaseMVPView> {
      *
      * @return
      */
-    protected boolean isViewGone() {
-        if (mFragment != null) {
-            return mFragment.isDetached();
-        } else if (mActivity != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                return mActivity.isFinishing() || mActivity.isDestroyed();
-            } else {
-                return mActivity.isFinishing();
+    protected boolean isViewVisible() {
+        V v = vWeakReference.get();
+        if (v != null) {
+            if (v instanceof AppCompatActivity) {
+                AppCompatActivity a = ((AppCompatActivity) v);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    return !(a.isFinishing() || a.isDestroyed());
+                } else {
+                    return !a.isFinishing();
+                }
+            } else if (v instanceof Fragment) {
+                Fragment f = ((Fragment) v);
+                return !f.isDetached();
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     public abstract class HttpCallback implements Callback {
         @Override
         public void onResponse(final Call call, final Response response) throws IOException {
             final String bodyStr = response.body().string();
-            if (!isViewGone()) {
+            if (isViewVisible()) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        onResponse(call, response, bodyStr);
+                        V v = vWeakReference.get();
+                        if (v != null) {
+                            onResponse(v, response, bodyStr);
+                        }
                     }
                 });
             }
@@ -132,19 +132,22 @@ public abstract class BaseMVPPresenter<V extends IBaseMVPView> {
 
         @Override
         public void onFailure(final Call call, final IOException e) {
-            if (!isViewGone()) {
+            if (isViewVisible()) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        onFailure(call, e, failedStr);
+                        V v = vWeakReference.get();
+                        if (v != null) {
+                            onFailure(v, failedStr);
+                        }
                     }
                 });
             }
         }
 
-        protected abstract void onFailure(Call call, IOException e, String str);
+        protected abstract void onFailure(V v, String str);
 
-        protected abstract void onResponse(Call call, Response response, String bodyStr);
+        protected abstract void onResponse(V v, Response response, String bodyStr);
     }
 
     //取消请求

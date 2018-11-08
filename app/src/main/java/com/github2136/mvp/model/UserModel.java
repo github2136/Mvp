@@ -7,8 +7,8 @@ import com.github2136.base.BaseMVPModel;
 import okhttp3.Callback;
 
 /**
- * Created by yb on 2018/10/23.
- **/
+ *
+  **/
 public class UserModel extends BaseMVPModel {
 
     public UserModel(Context context, String tag) {
@@ -16,6 +16,6 @@ public class UserModel extends BaseMVPModel {
     }
 
     public void get(Callback callback) {
-        httpGet("http://www.baidu.com", "", null, callback);
+        httpGet("http://www.asfrvre.com", "", null, callback);
     }
 }
