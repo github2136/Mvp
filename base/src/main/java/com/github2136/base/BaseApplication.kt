@@ -1,15 +1,15 @@
 package com.github2136.base
 
 import android.app.Application
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.github2136.util.CrashHandler
 import com.squareup.leakcanary.LeakCanary
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by yb on 2018/11/2.
  */
-class BaseApplication :Application() {
+class BaseApplication : Application() {
     private var mActivitys: ArrayList<AppCompatActivity>? = null
 
     override fun onCreate() {
@@ -22,8 +22,7 @@ class BaseApplication :Application() {
         LeakCanary.install(this)
         // Normal app init code...
         mActivitys = ArrayList()
-        val crashHandler = CrashHandler.getInstance()
-        crashHandler.setCustomCrashHanler(this, object : CrashHandler.CrashHandlerCallback {
+        CrashHandler.getInstance(this).setCallback(object : CrashHandler.CrashHandlerCallback {
             override fun finishAll() {
                 this@BaseApplication.finishAll()
             }

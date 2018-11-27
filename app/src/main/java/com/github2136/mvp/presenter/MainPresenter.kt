@@ -1,8 +1,8 @@
 package com.github2136.mvp.presenter
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.github2136.base.BaseMVPPresenter
 import com.github2136.base.CallbackData
 import com.github2136.mvp.model.UserModel

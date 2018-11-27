@@ -1,11 +1,11 @@
 package com.github2136.base
 
-import android.arch.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Message
-import android.support.annotation.StringRes
-import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import java.lang.ref.WeakReference
 
 /**

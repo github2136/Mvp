@@ -1,6 +1,6 @@
 package com.github2136.base
 
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 
 /**
  * Created by yb on 2018/11/1.
