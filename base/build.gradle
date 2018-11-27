@@ -22,7 +22,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    debugApi 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api 'com.github.github2136:Android-utils:aac498b1da'

@@ -1,8 +1,7 @@
 package com.github2136.base
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.support.v4.util.ArrayMap
+import androidx.collection.ArrayMap
 import com.github2136.util.JsonUtil
 import com.github2136.util.SPUtil
 import okhttp3.*
@@ -16,7 +15,7 @@ open class BaseMVPModel(app: Application, tag: String) {
 
     protected var mTag: String = tag
     protected var mSpUtil: SPUtil= SPUtil.getInstance(mApp)
-    protected var mJsonUtil: JsonUtil = JsonUtil.getInstance()
+    protected var mJsonUtil: JsonUtil = JsonUtil.instance
 
     protected fun httpGet(url: String,
                           method: String,
@@ -49,7 +48,7 @@ open class BaseMVPModel(app: Application, tag: String) {
         val JSON = MediaType.parse("application/json")
         var json = ""
         params?.let {
-            json = JsonUtil.getInstance().gson.toJson(params)
+            json = mJsonUtil.getGson().toJson(params)
         }
         val body = RequestBody.create(JSON, json)
 

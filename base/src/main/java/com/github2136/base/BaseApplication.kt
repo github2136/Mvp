@@ -3,7 +3,6 @@ package com.github2136.base
 import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import com.github2136.util.CrashHandler
-import com.squareup.leakcanary.LeakCanary
 import java.util.*
 
 /**
@@ -14,13 +13,6 @@ class BaseApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return
-        }
-        LeakCanary.install(this)
-        // Normal app init code...
         mActivitys = ArrayList()
         CrashHandler.getInstance(this).setCallback(object : CrashHandler.CrashHandlerCallback {
             override fun finishAll() {
