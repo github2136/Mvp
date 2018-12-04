@@ -5,6 +5,10 @@ import androidx.collection.ArrayMap
 import com.github2136.util.JsonUtil
 import com.github2136.util.SPUtil
 import okhttp3.*
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.util.*
+import kotlin.experimental.and
 
 /**
  * Created by yb on 2018/11/2.
@@ -33,8 +37,11 @@ open class BaseMVPModel(app: Application, tag: String) {
             }
             urlSb.deleteCharAt(urlSb.length - 1)
         }
+        val timestamp = getUTCTime().toString()
         val request = Request.Builder()
                 .url(urlSb.toString())
+                .addHeader("X-LC-Id", "3s0xLb9cJWhTWg35ClYDB1y5-gzGzoHsz")
+                .addHeader("X-LC-Sign", getMD5(timestamp + "V1K3AAxOEfvktc3leSVBpCWn") + "," + timestamp)
                 .tag(mTag)
                 .build()
         client.newCall(request).enqueue(callback)
@@ -59,6 +66,34 @@ open class BaseMVPModel(app: Application, tag: String) {
                 .build()
 
         client.newCall(request).enqueue(callback)
+    }
+
+
+    /**
+     * 获取UTC时间
+     *
+     * @return
+     */
+    private fun getUTCTime(): Long {
+        val cal = Calendar.getInstance()
+        cal.timeZone = TimeZone.getTimeZone("UTC")
+        return cal.timeInMillis
+    }
+
+    private fun getMD5(msg: String): String {
+        val hash: ByteArray
+        try {
+            hash = MessageDigest.getInstance("MD5").digest(msg.toByteArray())
+        } catch (e: NoSuchAlgorithmException) {
+            throw RuntimeException("Huh, MD5 should be supported?", e)
+        }
+
+        val hex = StringBuilder(hash.size * 2)
+        for (b in hash) {
+            if (b.toInt() and 0xFF < 0x10) hex.append("0")
+            hex.append(Integer.toHexString((b.toInt() and 0xFF)))
+        }
+        return hex.toString()
     }
 
     fun cancelRequest() {

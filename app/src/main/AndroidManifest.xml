@@ -14,12 +14,16 @@
         <meta-data
             android:name="util_sp_name"
             android:value="mvp"/>
+
         <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.VIEW"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".ui.activity.ListActivity">
         </activity>
     </application>
 

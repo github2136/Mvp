@@ -1,5 +1,6 @@
 package com.github2136.mvp.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.github2136.base.BaseActivity
@@ -23,7 +24,8 @@ class MainActivity : BaseActivity<MainPresenter>(), IMainView, View.OnClickListe
 
     override fun initData(savedInstanceState: Bundle?) {
         mPresenter.get()
-        btn1.setOnClickListener(this)
+        btn_retry.setOnClickListener(this)
+        btn_list.setOnClickListener(this)
     }
 
     override fun getSuccessful(msg: String?) {
@@ -35,6 +37,15 @@ class MainActivity : BaseActivity<MainPresenter>(), IMainView, View.OnClickListe
     }
 
     override fun onClick(v: View?) {
-        mPresenter.get()
+        when (v?.id) {
+            R.id.btn_retry -> {
+                mPresenter.get()
+            }
+            R.id.btn_list -> {
+                startActivity(Intent(this, ListActivity::class.java))
+            }
+            else -> {
+            }
+        }
     }
 }

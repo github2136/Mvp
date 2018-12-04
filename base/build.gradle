@@ -10,7 +10,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -24,7 +24,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    api 'com.github.github2136:Android-utils:aac498b1da'
+    def paging_version = "2.1.0-beta01"
+
+    api "androidx.paging:paging-runtime:$paging_version" // use -ktx for Kotlin
+    api 'com.github.github2136:Android-utils:cb73c7ee77'
     api 'com.google.code.gson:gson:2.8.2'
     api 'com.squareup.okhttp3:okhttp:3.11.0'
 }

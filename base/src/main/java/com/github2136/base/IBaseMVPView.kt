@@ -1,11 +1,12 @@
 package com.github2136.base
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.LifecycleOwner
 
 /**
  * Created by yb on 2018/11/1.
  */
-interface IBaseMVPView {
+interface IBaseMVPView : LifecycleOwner {
     // 显示进度框
     fun showProgressDialog()
 
