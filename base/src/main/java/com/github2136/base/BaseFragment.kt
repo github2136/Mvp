@@ -99,11 +99,7 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
     // Handler
     ///////////////////////////////////////////////////////////////////////////
     class Handler(fragment: BaseFragment<*>) : android.os.Handler() {
-        var weakReference: WeakReference<BaseFragment<*>>
-
-        init {
-            weakReference = WeakReference(fragment)
-        }
+        var weakReference: WeakReference<BaseFragment<*>> = WeakReference(fragment)
 
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)

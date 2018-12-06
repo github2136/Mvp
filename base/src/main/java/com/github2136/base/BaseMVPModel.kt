@@ -18,7 +18,7 @@ open class BaseMVPModel(app: Application, tag: String) {
     protected var mApp: Application = app
 
     protected var mTag: String = tag
-    protected var mSpUtil: SPUtil= SPUtil.getInstance(mApp)
+    protected var mSpUtil: SPUtil = SPUtil.getInstance(mApp)
     protected var mJsonUtil: JsonUtil = JsonUtil.instance
 
     protected fun httpGet(url: String,
@@ -45,6 +45,32 @@ open class BaseMVPModel(app: Application, tag: String) {
                 .tag(mTag)
                 .build()
         client.newCall(request).enqueue(callback)
+    }
+
+    protected fun httpGet(url: String,
+                          method: String,
+                          params: ArrayMap<String, Any>?
+    ): Response? {
+        val urlSb = StringBuilder(url + method)
+
+        params?.let {
+            urlSb.append("?")
+            for ((key, value) in params) {
+                urlSb.append(key)
+                urlSb.append("=")
+                urlSb.append(value)
+                urlSb.append("&")
+            }
+            urlSb.deleteCharAt(urlSb.length - 1)
+        }
+        val timestamp = getUTCTime().toString()
+        val request = Request.Builder()
+                .url(urlSb.toString())
+                .addHeader("X-LC-Id", "3s0xLb9cJWhTWg35ClYDB1y5-gzGzoHsz")
+                .addHeader("X-LC-Sign", getMD5(timestamp + "V1K3AAxOEfvktc3leSVBpCWn") + "," + timestamp)
+                .tag(mTag)
+                .build()
+        return client.newCall(request).execute()
     }
 
     protected fun httpPost(url: String,

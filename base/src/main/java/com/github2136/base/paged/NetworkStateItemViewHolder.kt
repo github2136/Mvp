@@ -47,10 +47,15 @@ class NetworkStateItemViewHolder(view: View,
         errorMsg?.visibility = toVisibility(networkState?.msg != null)
 
         errorMsg?.text = networkState?.msg
+
+        if (networkState?.status == Status.SUCCESS) {
+            errorMsg?.visibility = View.VISIBLE
+            errorMsg?.text = "已加载所有数据"
+        }
     }
 
     companion object {
-        fun create(parent: ViewGroup,layoutId :Int, retryCallback: () -> Unit): NetworkStateItemViewHolder {
+        fun create(parent: ViewGroup, layoutId: Int, retryCallback: () -> Unit): NetworkStateItemViewHolder {
             val view = LayoutInflater.from(parent.context)
                     .inflate(layoutId, parent, false)
             return NetworkStateItemViewHolder(view, retryCallback)

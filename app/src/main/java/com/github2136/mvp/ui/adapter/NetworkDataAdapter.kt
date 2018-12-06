@@ -3,14 +3,13 @@ package com.github2136.mvp.ui.adapter
 import androidx.recyclerview.widget.DiffUtil
 import com.github2136.base.ViewHolderRecyclerView
 import com.github2136.base.paged.BaseListAdapter
-import com.github2136.base.paged.NetworkState
 import com.github2136.mvp.R
 import com.github2136.mvp.model.entity.NetworkData
 
 /**
  * Created by yb on 2018/11/29.
  */
-class NetworkDataAdapter(private val retryCallback: () -> Unit) : BaseListAdapter<NetworkData>(retryCallback, DIFF_CALLBACK) {
+class NetworkDataAdapter(retryCallback: () -> Unit) : BaseListAdapter<NetworkData>(retryCallback, DIFF_CALLBACK) {
 
     override fun getLayoutId(viewType: Int): Int {
         return R.layout.item_data

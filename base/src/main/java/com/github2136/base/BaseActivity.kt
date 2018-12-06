@@ -15,7 +15,7 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
     protected lateinit var mPresenter: P
     protected val TAG = this.javaClass.name
     protected lateinit var mApp: BaseApplication
-    protected lateinit var mActivity: BaseActivity<*>
+    protected lateinit var mActivity: BaseActivity<P>
     protected lateinit var mHandler: Handler
     protected var mToast: Toast? = null
 
@@ -25,7 +25,7 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
         mApp = application as BaseApplication
         mApp.addActivity(this)
         mActivity = this
-        setContentView(getViewResId())
+        setContentView(getLayoutId())
         mHandler = Handler(this)
         initPresenter()
         mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
@@ -107,7 +107,7 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
     protected abstract fun initPresenter()
 
     //布局ID
-    protected abstract fun getViewResId(): Int
+    protected abstract fun getLayoutId(): Int
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)

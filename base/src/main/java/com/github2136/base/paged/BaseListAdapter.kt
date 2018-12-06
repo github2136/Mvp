@@ -1,6 +1,5 @@
 package com.github2136.base.paged
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter

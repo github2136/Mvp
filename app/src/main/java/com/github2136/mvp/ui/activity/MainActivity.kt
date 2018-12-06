@@ -18,7 +18,7 @@ class MainActivity : BaseActivity<MainPresenter>(), IMainView, View.OnClickListe
         getPresenter(MainPresenter::class.java).init(this)
     }
 
-    override fun getViewResId(): Int {
+    override fun getLayoutId(): Int {
         return R.layout.activity_main
     }
 

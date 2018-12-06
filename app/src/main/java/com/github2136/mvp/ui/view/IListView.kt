@@ -9,7 +9,4 @@ import com.github2136.base.IBaseMVPView
  */
 interface IListView : IBaseMVPListView  {
 
-    fun getSuccessful()
-
-    fun getFailure(msg: String?)
 }
