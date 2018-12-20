@@ -103,11 +103,11 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
 
     protected fun handleMessage(msg: Message) {}
 
-    //初始化Presenter
-    protected abstract fun initPresenter()
-
     //布局ID
     protected abstract fun getLayoutId(): Int
+
+    //初始化Presenter
+    protected abstract fun initPresenter()
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)

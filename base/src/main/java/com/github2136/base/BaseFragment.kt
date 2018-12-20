@@ -109,11 +109,10 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
     }
 
     protected fun handleMessage(msg: Message) {}
-
-    protected abstract fun getPresenter(): P
-
     //布局ID
     protected abstract fun getViewResId(): Int
+
+    protected abstract fun getPresenter(): P
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)
