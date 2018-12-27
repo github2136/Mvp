@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import java.lang.ref.WeakReference
 
 /**
@@ -16,7 +17,6 @@ import java.lang.ref.WeakReference
  */
 abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView {
     protected val TAG = this.javaClass.name
-    private var isInit: Boolean = false
     protected lateinit var mPresenter: P
     protected var mRootView: View? = null
     protected lateinit var mContext: Context
@@ -38,28 +38,26 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
         mHandler = Handler(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        if (mRootView == null) {
-            mRootView = inflater.inflate(getViewResId(), container, false)
-        }
-        val parent = mRootView!!.parent as ViewGroup
-        parent?.removeView(mRootView)
-        return mRootView
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        return inflater.inflate(getViewResId(), container, false)
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (!isInit) {
-            isInit = true
-            mPresenter = getPresenter()
-            initData(savedInstanceState)
-        }
+        initPresenter()
+        initData(savedInstanceState)
+    }
+
+    //获得presenter
+    protected fun getPresenter(clazz: Class<P>): P {
+        this.mPresenter = ViewModelProviders.of(this).get(clazz)
+        return mPresenter
     }
 
     override fun onDestroyView() {
-        if (isInit) {
-            cancelRequest()
-        }
+        cancelRequest()
         super.onDestroyView()
     }
 
@@ -94,7 +92,17 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
             it.show()
         }
     }
+    // 显示进度框
+    override fun showProgressDialog() {}
 
+    // 显示进度框
+    override fun showProgressDialog(@StringRes resId: Int) {}
+
+    // 显示进度框
+    override fun showProgressDialog(msg: String) {}
+
+    // 关闭进度框
+    override fun dismissDialog() {}
     ///////////////////////////////////////////////////////////////////////////
     // Handler
     ///////////////////////////////////////////////////////////////////////////
@@ -112,7 +120,8 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
     //布局ID
     protected abstract fun getViewResId(): Int
 
-    protected abstract fun getPresenter(): P
+    //初始化Presenter
+    protected abstract fun initPresenter()
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)

@@ -5,7 +5,7 @@ import android.os.Message
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import java.lang.ref.WeakReference
 
 /**
@@ -40,7 +40,7 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
 
     //获得presenter
     protected fun getPresenter(clazz: Class<P>): P {
-        this.mPresenter = ViewModelProvider.AndroidViewModelFactory.getInstance(application).create(clazz)
+        this.mPresenter = ViewModelProviders.of(this).get(clazz)
         return mPresenter
     }
 
