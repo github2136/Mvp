@@ -63,7 +63,7 @@ abstract class BaseListMVPPresenter<T, V>(app: Application) : BaseMVPPresenter<V
         )
     }
 
-    fun get(params: String) {
+    fun get(params: String = "") {
         this@BaseListMVPPresenter.params.value = params
     }
 
