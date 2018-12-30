@@ -14,11 +14,12 @@ class DataModel(app: Application, tag: String) : BaseMVPModel(app, tag) {
         httpGet("http://www.baidu.com", "", null, callback)
     }
 
-    fun getList(array: ArrayMap<String, Any>): Response? {
-        return httpGet("https://leancloud.cn:443/1.1/classes/", "todos", array)
-    }
-
-    fun getList(array: ArrayMap<String, Any>, callback: Callback) {
-        httpGet("https://leancloud.cn:443/1.1/classes/", "todos", array, callback)
+    fun getList(array: ArrayMap<String, Any>, sync: Boolean = false, callback: Callback? = null): Response? {
+        return if (sync) {
+            httpGet("https://leancloud.cn:443/1.1/classes/", "todos", array)
+        } else {
+            httpGet("https://leancloud.cn:443/1.1/classes/", "todos", array, callback!!)
+            null
+        }
     }
 }
