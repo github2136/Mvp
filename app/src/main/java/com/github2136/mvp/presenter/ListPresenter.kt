@@ -19,6 +19,7 @@ import java.io.IOException
 class ListPresenter(private val app: Application) : BaseListMVPPresenter<NetworkData, IListView>(app) {
     override var initSize = 40
     override fun getDataSource(paramsStr: String): ListDataSource {
+        //paramsStr查询时的参数，如果查询时需要则添加到DataSource中
         return LDataSource()
     }
 
