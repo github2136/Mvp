@@ -19,6 +19,7 @@ import java.io.IOException
 class ListPresenter(private val app: Application) : BaseListMVPPresenter<NetworkData, IListView>(app) {
     override var initSize = 40
     override fun getDataSource(paramsStr: String): ListDataSource {
+        //paramsStr查询时的参数，如果查询时需要则添加到DataSource中
         return LDataSource()
     }
 
@@ -39,7 +40,7 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
             val p = ArrayMap<String, Any>()
             p.put("limit", params.requestedLoadSize)
             p.put("skip", 0)
-            val response = mListModel.getList(p);
+            val response = mListModel.getList(p, true);
             if (response?.isSuccessful == true) {
                 retry = null
                 initialLoad.postValue(NetworkState.LOADED)
@@ -62,8 +63,8 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
             networkState.postValue(NetworkState.LOADING)
             val p = ArrayMap<String, Any>()
             p.put("limit", params.requestedLoadSize)
-            p.put("skip",( params.key -1)* params.requestedLoadSize+initSize)
-            mListModel.getList(p, object : Callback {
+            p.put("skip", (params.key - 1) * params.requestedLoadSize + initSize)
+            mListModel.getList(p, callback = object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     retry = {
                         loadAfter(params, callback)

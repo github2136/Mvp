@@ -15,6 +15,7 @@ class ListActivity : BaseListActivity<NetworkData, ListPresenter>(), IListView {
     }
 
     override fun initListData(savedInstanceState: Bundle?) {
+        //添加查询时的参数
         mPresenter.get("sss")
     }
 
