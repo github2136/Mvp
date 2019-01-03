@@ -6,6 +6,7 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github2136.base.BaseActivity
+import com.github2136.base.BaseRecyclerAdapter
 import com.github2136.base.R
 
 /**
@@ -21,6 +22,18 @@ abstract class BaseListActivity<T, P : BaseListMVPPresenter<T, *>> : BaseActivit
         rvContent = findViewById(R.id.rv_content)
 
         mAdapter = getAdapter()
+        mAdapter.setOnItemClickListener(object : BaseRecyclerAdapter.OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                itemClick(mAdapter.getItem(position)!!, position)
+            }
+
+        })
+        mAdapter.setOnItemLongClickListener(object : BaseRecyclerAdapter.OnItemLongClickListener {
+            override fun onItemClick(position: Int) {
+                itemClick(mAdapter.getItem(position)!!, position)
+            }
+
+        })
         rvContent.adapter = mAdapter
         mPresenter.list.observe(this, Observer<PagedList<T>> {
             mAdapter.submitList(it)
@@ -43,7 +56,7 @@ abstract class BaseListActivity<T, P : BaseListMVPPresenter<T, *>> : BaseActivit
 
     protected abstract fun getAdapter(): BaseListAdapter<T>
 
-    protected fun itemClick(t: T, position: Int) {}
+    protected open fun itemClick(t: T, position: Int) {}
 
-    protected fun itemLongClick(t: T, position: Int) {}
+    protected open fun itemLongClick(t: T, position: Int) {}
 }

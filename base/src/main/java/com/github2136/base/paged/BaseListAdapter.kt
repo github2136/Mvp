@@ -63,6 +63,10 @@ abstract class BaseListAdapter<T>(private val retryCallback: () -> Unit, diffCal
         }
     }
 
+    public override fun getItem(position: Int): T? {
+        return super.getItem(position)
+    }
+
     protected abstract fun onBindView(t: T, holder: ViewHolderRecyclerView, position: Int)
 
 
