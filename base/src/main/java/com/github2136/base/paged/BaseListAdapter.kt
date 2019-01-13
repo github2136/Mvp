@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.github2136.base.BaseRecyclerAdapter
 import com.github2136.base.R
 import com.github2136.base.ViewHolderRecyclerView
 
@@ -63,6 +62,10 @@ abstract class BaseListAdapter<T>(private val retryCallback: () -> Unit, diffCal
         }
     }
 
+    public override fun getItem(position: Int): T? {
+        return super.getItem(position)
+    }
+
     protected abstract fun onBindView(t: T, holder: ViewHolderRecyclerView, position: Int)
 
 
@@ -99,14 +102,14 @@ abstract class BaseListAdapter<T>(private val retryCallback: () -> Unit, diffCal
 
     }
 
-    protected var itemClickListener: BaseRecyclerAdapter.OnItemClickListener? = null
-    protected var itemLongClickListener: BaseRecyclerAdapter.OnItemLongClickListener? = null
+    protected var itemClickListener: ((Int) -> Unit)? = null
+    protected var itemLongClickListener: ((Int) -> Unit)? = null
 
-    fun setOnItemClickListener(itemClickListener: BaseRecyclerAdapter.OnItemClickListener) {
+    fun setOnItemClickListener(itemClickListener: ((Int) -> Unit)) {
         this.itemClickListener = itemClickListener
     }
 
-    fun setOnItemLongClickListener(itemLongClickListener: BaseRecyclerAdapter.OnItemLongClickListener) {
+    fun setOnItemLongClickListener(itemLongClickListener: ((Int) -> Unit)) {
         this.itemLongClickListener = itemLongClickListener
     }
 }

@@ -21,6 +21,9 @@ abstract class BaseListActivity<T, P : BaseListMVPPresenter<T, *>> : BaseActivit
         rvContent = findViewById(R.id.rv_content)
 
         mAdapter = getAdapter()
+        mAdapter.setOnItemClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
+        mAdapter.setOnItemLongClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
+
         rvContent.adapter = mAdapter
         mPresenter.list.observe(this, Observer<PagedList<T>> {
             mAdapter.submitList(it)
@@ -43,7 +46,7 @@ abstract class BaseListActivity<T, P : BaseListMVPPresenter<T, *>> : BaseActivit
 
     protected abstract fun getAdapter(): BaseListAdapter<T>
 
-    protected fun itemClick(t: T, position: Int) {}
+    protected open fun itemClick(t: T, position: Int) {}
 
-    protected fun itemLongClick(t: T, position: Int) {}
+    protected open fun itemLongClick(t: T, position: Int) {}
 }
