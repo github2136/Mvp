@@ -2,10 +2,12 @@ package com.github2136.base
 
 import android.os.Bundle
 import android.os.Message
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
 
 /**
@@ -55,6 +57,33 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
             val activity = weakReference.get()
             activity?.handleMessage(msg)
         }
+    }
+
+    private var baseView: View? = null
+    /**
+     * 获取SnackBar所需的view
+     */
+    open fun findBaseView(): View {
+        if (baseView == null) {
+            baseView = findViewById(R.id.view)
+        }
+        return baseView!!
+    }
+
+    fun showSnackBar(msg: String) {
+        Snackbar.make(findBaseView(), msg, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun showSnackBar(@StringRes resId: Int) {
+        Snackbar.make(findBaseView(), resId, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun showSnackBarLong(msg: String) {
+        Snackbar.make(findBaseView(), msg, Snackbar.LENGTH_LONG).show()
+    }
+
+    fun showSnackBarLong(@StringRes resId: Int) {
+        Snackbar.make(findBaseView(), resId, Snackbar.LENGTH_LONG).show()
     }
 
     fun showToast(msg: String) {

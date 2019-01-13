@@ -2,4 +2,5 @@
 <resources>
     <item name="sr_content" type="id"/>
     <item name="rv_content" type="id"/>
+    <item name="view" type="id"/>
 </resources>
