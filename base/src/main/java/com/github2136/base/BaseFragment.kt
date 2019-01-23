@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
 
 /**
@@ -40,7 +41,8 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(getViewResId(), container, false)
+        mRootView = inflater.inflate(getViewResId(), container, false)
+        return mRootView
     }
 
 
@@ -59,6 +61,33 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
     override fun onDestroyView() {
         cancelRequest()
         super.onDestroyView()
+    }
+
+    private var baseView: View? = null
+    /**
+     * 获取SnackBar所需的view
+     */
+    open fun findBaseView(): View {
+        if (baseView == null) {
+            baseView = mRootView!!.findViewById(R.id.view)
+        }
+        return baseView!!
+    }
+
+    fun showSnackBar(msg: String) {
+        Snackbar.make(findBaseView(), msg, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun showSnackBar(@StringRes resId: Int) {
+        Snackbar.make(findBaseView(), resId, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun showSnackBarLong(msg: String) {
+        Snackbar.make(findBaseView(), msg, Snackbar.LENGTH_LONG).show()
+    }
+
+    fun showSnackBarLong(@StringRes resId: Int) {
+        Snackbar.make(findBaseView(), resId, Snackbar.LENGTH_LONG).show()
     }
 
     fun showToast(msg: String) {
@@ -92,6 +121,7 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
             it.show()
         }
     }
+
     // 显示进度框
     override fun showProgressDialog() {}
 
@@ -103,6 +133,7 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
 
     // 关闭进度框
     override fun dismissDialog() {}
+
     ///////////////////////////////////////////////////////////////////////////
     // Handler
     ///////////////////////////////////////////////////////////////////////////

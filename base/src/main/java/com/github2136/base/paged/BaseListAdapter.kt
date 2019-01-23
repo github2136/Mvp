@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import com.github2136.base.BaseRecyclerAdapter
 import com.github2136.base.R
 import com.github2136.base.ViewHolderRecyclerView
 
