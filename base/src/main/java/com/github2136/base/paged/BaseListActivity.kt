@@ -21,19 +21,11 @@ abstract class BaseListActivity<T, P : BaseListMVPPresenter<T, *>> : BaseActivit
         srContent = findViewById(R.id.sr_content)
         rvContent = findViewById(R.id.rv_content)
 
+
         mAdapter = getAdapter()
-        mAdapter.setOnItemClickListener(object : BaseRecyclerAdapter.OnItemClickListener {
-            override fun onItemClick(position: Int) {
-                itemClick(mAdapter.getItem(position)!!, position)
-            }
+        mAdapter.setOnItemClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
+        mAdapter.setOnItemLongClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
 
-        })
-        mAdapter.setOnItemLongClickListener(object : BaseRecyclerAdapter.OnItemLongClickListener {
-            override fun onItemClick(position: Int) {
-                itemClick(mAdapter.getItem(position)!!, position)
-            }
-
-        })
         rvContent.adapter = mAdapter
         mPresenter.list.observe(this, Observer<PagedList<T>> {
             mAdapter.submitList(it)

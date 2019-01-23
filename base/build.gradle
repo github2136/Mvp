@@ -27,10 +27,15 @@ dependencies {
     def paging_version = "2.1.0-beta01"
     api 'androidx.appcompat:appcompat:1.0.2'
     api "androidx.paging:paging-runtime:$paging_version" // use -ktx for Kotlin
-    api 'com.github.github2136:Android-utils:cb73c7ee77'
+    api 'com.github.github2136:Android-utils:3e3eb100c9'
     api 'com.google.code.gson:gson:2.8.5'
     api 'com.squareup.okhttp3:okhttp:3.11.0'
     api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha01'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
+    // Optional, if you use support library fragments:
+    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
 }
 // 指定编码
 tasks.withType(JavaCompile) {

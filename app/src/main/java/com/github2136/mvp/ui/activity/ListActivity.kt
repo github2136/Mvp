@@ -24,6 +24,6 @@ class ListActivity : BaseListActivity<NetworkData, ListPresenter>(), IListView {
     }
 
     override fun initPresenter() {
-        getPresenter(ListPresenter::class.java).init(this)
+        getPresenter(ListPresenter::class.java)
     }
 }
