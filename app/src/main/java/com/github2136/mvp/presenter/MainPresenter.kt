@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.github2136.base.BaseMVPPresenter
 import com.github2136.base.CallbackData
-import com.github2136.base.paged.NetworkState
 import com.github2136.mvp.model.DataModel
 import com.github2136.mvp.ui.view.IMainView
 import okhttp3.Call
@@ -24,31 +23,31 @@ class MainPresenter(private val app: Application) : BaseMVPPresenter<IMainView>(
     override fun init(v: IMainView) {
         super.init(v)
         mDataModel = DataModel(app, v.toString())
+
+        ldGet.observe(mView, Observer { t ->
+            if (t?.isSuccess == true) {
+                mView.getSuccessful(t.str)
+            } else {
+                mView.getFailure(failedStr)
+            }
+        })
     }
 
     fun get() {
-        getView()?.let {
-            ldGet.observe(it, Observer { t ->
-                if (t?.isSuccess == true) {
-                    it.getSuccessful(t.str)
-                } else {
-                    it.getFailure(failedStr)
-                }
-            })
-            mDataModel.getStr(object : Callback {
-                override fun onFailure(call: Call?, e: IOException?) {
-                    ldGet.postValue(CallbackData(false, failedStr))
-                }
+        mDataModel.getStr(object : Callback {
+            override fun onFailure(call: Call?, e: IOException?) {
+                ldGet.postValue(CallbackData(false, failedStr))
+            }
 
-                override fun onResponse(call: Call?, response: Response?) {
+            override fun onResponse(call: Call?, response: Response?) {
                     if (response?.isSuccessful == true) {
                         ldGet.postValue(CallbackData(true, response.body()?.string()))
                     } else {
                         ldGet.postValue(CallbackData(false, failedStr))
                     }
-                }
-            })
-        }
+            }
+        })
+
     }
 
     override fun cancelRequest() {

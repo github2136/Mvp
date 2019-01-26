@@ -14,18 +14,14 @@ import java.lang.ref.WeakReference
  * Created by yb on 2018/11/1.
  */
 abstract class BaseMVPPresenter<V>(app: Application) : AndroidViewModel(app) where  V : IBaseMVPView, V : LifecycleOwner {
-    protected lateinit var mView: WeakReference<V>
+    protected lateinit var mView: V
     protected val failedStr = "无法连接服务器"
     protected var mJsonUtil: JsonUtil = JsonUtil.instance
     protected var mSpUtil: SPUtil = SPUtil.getInstance(app)
     protected var mHandler: Handler = Handler(Looper.getMainLooper())
 
     open fun init(v: V) {
-        mView = WeakReference(v)
-    }
-
-    fun getView(): V? {
-        return mView.get()
+        mView = v
     }
 
     fun postMain(runnable: Runnable) {

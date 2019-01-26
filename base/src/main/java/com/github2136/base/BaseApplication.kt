@@ -14,7 +14,7 @@ class BaseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         mActivitys = ArrayList()
-        CrashHandler.getInstance(this).setCallback(object : CrashHandler.CrashHandlerCallback {
+        CrashHandler.getInstance(this,BuildConfig.DEBUG).setCallback(object : CrashHandler.CrashHandlerCallback {
             override fun finishAll() {
                 this@BaseApplication.finishAll()
             }
