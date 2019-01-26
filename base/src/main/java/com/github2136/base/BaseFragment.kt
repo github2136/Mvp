@@ -19,7 +19,6 @@ import java.lang.ref.WeakReference
 abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView {
     protected val TAG = this.javaClass.name
     protected lateinit var mPresenter: P
-    protected var mRootView: View? = null
     protected lateinit var mContext: Context
     protected lateinit var mHandler: Handler
     protected var mToast: Toast? = null
@@ -41,8 +40,7 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        mRootView = inflater.inflate(getViewResId(), container, false)
-        return mRootView
+        return inflater.inflate(getViewResId(), container, false)
     }
 
 
@@ -67,9 +65,9 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
     /**
      * 获取SnackBar所需的view
      */
-    open fun findBaseView(): View {
+    fun findBaseView(): View {
         if (baseView == null) {
-            baseView = mRootView!!.findViewById(R.id.view)
+            baseView = view!!.findViewById(R.id.view)
         }
         return baseView!!
     }
