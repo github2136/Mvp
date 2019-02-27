@@ -13,11 +13,6 @@ import kotlinx.android.synthetic.main.activity_main.*
  * Created by yb on 2018/11/2.
  */
 class MainActivity : BaseActivity<MainPresenter>(), IMainView, View.OnClickListener {
-
-    override fun initPresenter() {
-        getPresenter(MainPresenter::class.java).init(this)
-    }
-
     override fun getLayoutId(): Int {
         return R.layout.activity_main
     }

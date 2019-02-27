@@ -23,7 +23,4 @@ class ListActivity : BaseListActivity<NetworkData, ListPresenter>(), IListView {
         return NetworkDataAdapter { mPresenter.retry() }
     }
 
-    override fun initPresenter() {
-        getPresenter(ListPresenter::class.java)
-    }
 }

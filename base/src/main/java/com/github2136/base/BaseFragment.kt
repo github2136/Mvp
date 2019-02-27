@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
+import java.lang.reflect.ParameterizedType
 
 /**
  * Created by yb on 2018/11/2.
@@ -46,14 +47,14 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initPresenter()
+        getPresenter((this.javaClass.genericSuperclass as ParameterizedType).getActualTypeArguments()[0] as Class<P>)
         initData(savedInstanceState)
     }
 
     //获得presenter
-    protected fun getPresenter(clazz: Class<P>): P {
+    protected fun getPresenter(clazz: Class<P>) {
         this.mPresenter = ViewModelProviders.of(this).get(clazz)
-        return mPresenter
+        (mPresenter as BaseMVPPresenter<IBaseMVPView>).init(this)
     }
 
     override fun onDestroyView() {
@@ -148,9 +149,6 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
     protected fun handleMessage(msg: Message) {}
     //布局ID
     protected abstract fun getViewResId(): Int
-
-    //初始化Presenter
-    protected abstract fun initPresenter()
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)

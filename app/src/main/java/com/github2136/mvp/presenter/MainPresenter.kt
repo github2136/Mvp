@@ -34,20 +34,16 @@ class MainPresenter(private val app: Application) : BaseMVPPresenter<IMainView>(
     }
 
     fun get() {
-        mDataModel.getStr(object : Callback {
-            override fun onFailure(call: Call?, e: IOException?) {
-                ldGet.postValue(CallbackData(false, failedStr))
-            }
-
-            override fun onResponse(call: Call?, response: Response?) {
-                    if (response?.isSuccessful == true) {
+        mDataModel.getStr(
+                response = { _, response ->
+                    if (response.isSuccessful) {
                         ldGet.postValue(CallbackData(true, response.body()?.string()))
                     } else {
                         ldGet.postValue(CallbackData(false, failedStr))
                     }
-            }
-        })
-
+                },
+                failure = { _, _ -> ldGet.postValue(CallbackData(false, failedStr)) }
+        )
     }
 
     override fun cancelRequest() {

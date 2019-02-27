@@ -14,26 +14,24 @@ import com.github2136.base.IBaseMVPView
 /**
  *  Created by yb on 2018/11/28.
  **/
-abstract class BaseListMVPPresenter<T, V>(app: Application) : BaseMVPPresenter<V>(app) where  V : IBaseMVPView, V : LifecycleOwner {
+abstract class BaseListMVPPresenter<T, V : IBaseMVPView>(app: Application) : BaseMVPPresenter<V>(app) {
     //初始化页数量
     open var initSize = 10
     //每页数量
     open var pageSize = 10
     private val params = MutableLiveData<String>()
-    private val repoResult = Transformations.map(params) {
-        getList(it)
-    }
+    private val repoResult = Transformations.map(params) { getList(it) }
 
-    val list = Transformations.switchMap(repoResult) { it.pagedList }!!
-    val networkState = Transformations.switchMap(repoResult) { it.networkState }!!
-    val refreshState = Transformations.switchMap(repoResult) { it.refreshState }!!
+    val list = Transformations.switchMap(repoResult) { it.pagedList }
+    val networkState = Transformations.switchMap(repoResult) { it.networkState }
+    val refreshState = Transformations.switchMap(repoResult) { it.refreshState }
     //刷新
     fun refresh() {
         repoResult.value?.refresh?.invoke()
     }
 
     fun retry() {
-        val listing = repoResult?.value
+        val listing = repoResult.value
         listing?.retry?.invoke()
     }
 

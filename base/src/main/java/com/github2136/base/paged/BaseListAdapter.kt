@@ -10,8 +10,8 @@ import com.github2136.base.ViewHolderRecyclerView
 /**
  *  Created by yb on 2018/12/2.
  **/
-abstract class BaseListAdapter<T>(private val retryCallback: () -> Unit, diffCallback: DiffUtil.ItemCallback<T>) : PagedListAdapter<T,
-        ViewHolderRecyclerView>(diffCallback) {
+abstract class BaseListAdapter<T>(private val retryCallback: () -> Unit, diffCallback: DiffUtil.ItemCallback<T>) :
+        PagedListAdapter<T, ViewHolderRecyclerView>(diffCallback) {
     //查询时网络状态
     var networkState: NetworkState? = null
         set(value) {

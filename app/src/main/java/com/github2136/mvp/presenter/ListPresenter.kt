@@ -64,32 +64,30 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
             val p = ArrayMap<String, Any>()
             p.put("limit", params.requestedLoadSize)
             p.put("skip", (params.key - 1) * params.requestedLoadSize + initSize)
-            mListModel.getList(p, callback = object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    retry = {
-                        loadAfter(params, callback)
-                    }
-                    networkState.postValue(NetworkState.error(failedStr))
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        retry = null
-                        response.body()?.string()?.let {
-                            val list = mJsonUtil.getObjectByStr(it, NetworkResult::class.java)
-                            list?.let {
-                                callback.onResult(it.results, params.key + 1)
+            mListModel.getList(p,
+                    response = { _, response ->
+                        if (response.isSuccessful) {
+                            retry = null
+                            response.body()?.string()?.let {
+                                val list = mJsonUtil.getObjectByStr(it, NetworkResult::class.java)
+                                list?.let {
+                                    callback.onResult(it.results, params.key + 1)
+                                }
                             }
+                            networkState.postValue(NetworkState.LOADED)
+                        } else {
+                            retry = {
+                                loadAfter(params, callback)
+                            }
+                            networkState.postValue(NetworkState.error(failedStr))
                         }
-                        networkState.postValue(NetworkState.LOADED)
-                    } else {
+                    },
+                    failure = { _, _ ->
                         retry = {
                             loadAfter(params, callback)
                         }
                         networkState.postValue(NetworkState.error(failedStr))
-                    }
-                }
-            })
+                    })
         }
     }
 }

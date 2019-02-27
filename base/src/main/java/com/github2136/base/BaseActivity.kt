@@ -2,6 +2,7 @@ package com.github2136.base
 
 import android.os.Bundle
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -9,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+
 
 /**
  * Created by yb on 2018/11/2.
@@ -29,7 +33,13 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
         mActivity = this
         setContentView(getLayoutId())
         mHandler = Handler(this)
-        initPresenter()
+
+        val type = (this.javaClass.genericSuperclass as ParameterizedType).getActualTypeArguments()
+        if (type.size > 1) {
+            getPresenter(type[1] as Class<P>)
+        } else {
+            getPresenter(type[0] as Class<P>)
+        }
         mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
         initData(savedInstanceState)
     }
@@ -41,9 +51,9 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
     }
 
     //获得presenter
-    protected fun getPresenter(clazz: Class<P>): P {
+    protected fun getPresenter(clazz: Class<P>) {
         this.mPresenter = ViewModelProviders.of(this).get(clazz)
-        return mPresenter
+        (mPresenter as BaseMVPPresenter<IBaseMVPView>).init(this)
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -134,9 +144,6 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
 
     //布局ID
     protected abstract fun getLayoutId(): Int
-
-    //初始化Presenter
-    protected abstract fun initPresenter()
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)
