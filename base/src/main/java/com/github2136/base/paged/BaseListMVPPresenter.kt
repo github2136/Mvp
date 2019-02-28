@@ -10,6 +10,7 @@ import androidx.paging.PageKeyedDataSource
 import androidx.paging.PagedList
 import com.github2136.base.BaseMVPPresenter
 import com.github2136.base.IBaseMVPView
+import kotlin.concurrent.thread
 
 /**
  *  Created by yb on 2018/11/28.
@@ -82,7 +83,11 @@ abstract class BaseListMVPPresenter<T, V : IBaseMVPView>(app: Application) : Bas
         fun retryAllFailed() {
             val prevRetry = retry
             retry = null
-            prevRetry?.invoke()
+            prevRetry?.let {
+                getNetworkExecutor().execute {
+                    it.invoke()
+                }
+            }
         }
 
         override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, T>) {}

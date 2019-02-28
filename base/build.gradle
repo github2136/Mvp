@@ -24,14 +24,13 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    def paging_version = "2.1.0-beta01"
     api 'androidx.appcompat:appcompat:1.0.2'
-    api "androidx.paging:paging-runtime:$paging_version" // use -ktx for Kotlin
+    api "androidx.paging:paging-runtime:2.1.0"
     api 'com.github.github2136:Android-utils:3e3eb100c9'
     api 'com.google.code.gson:gson:2.8.5'
     api 'com.squareup.okhttp3:okhttp:3.11.0'
-    api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha01'
-    api 'com.google.android.material:material:1.0.0-rc01'
+    api 'androidx.lifecycle:lifecycle-extensions:2.1.0-alpha02'
+    api 'com.google.android.material:material:1.1.0-alpha03'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'

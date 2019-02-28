@@ -16,6 +16,9 @@
 
 package com.github2136.base.paged
 
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+
 enum class Status {
     RUNNING,
     SUCCESS,
@@ -32,3 +35,8 @@ data class NetworkState private constructor(
         fun error(msg: String?) = NetworkState(Status.FAILED, msg)
     }
 }
+
+val executor: Executor = Executors.newFixedThreadPool(5)
+@Synchronized
+fun getNetworkExecutor(): Executor = executor
+

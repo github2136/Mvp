@@ -8,10 +8,7 @@ import com.github2136.mvp.model.DataModel
 import com.github2136.mvp.model.entity.NetworkData
 import com.github2136.mvp.model.entity.NetworkResult
 import com.github2136.mvp.ui.view.IListView
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import java.io.IOException
+import java.util.*
 
 /**
  * Created by yb on 2018/12/5.
@@ -38,18 +35,19 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
             //首页初始化数据必须使用同步方法
             initialLoad.postValue(NetworkState.LOADING)
             val p = ArrayMap<String, Any>()
-            p.put("limit", params.requestedLoadSize)
-            p.put("skip", 0)
-            val response = mListModel.getList(p, true);
-            if (response?.isSuccessful == true) {
+            p["limit"] = params.requestedLoadSize
+            p["skip"] = 0
+            val response = mListModel.getList(p, true)
+
+            if (Random().nextBoolean() && response?.isSuccessful == true) {
                 retry = null
-                initialLoad.postValue(NetworkState.LOADED)
                 response.body()?.string()?.let {
                     val list = mJsonUtil.getObjectByStr(it, NetworkResult::class.java)
                     list?.let {
-                        callback.onResult(it.results, 0, 1)
+                        callback.onResult(it.results, 0, 0)
                     }
                 }
+                initialLoad.postValue(NetworkState.LOADED)
             } else {
                 retry = {
                     loadInitial(params, callback)
@@ -62,8 +60,8 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
         override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, NetworkData>) {
             networkState.postValue(NetworkState.LOADING)
             val p = ArrayMap<String, Any>()
-            p.put("limit", params.requestedLoadSize)
-            p.put("skip", (params.key - 1) * params.requestedLoadSize + initSize)
+            p["limit"] = params.requestedLoadSize
+            p["skip"] = params.key * params.requestedLoadSize + initSize
             mListModel.getList(p,
                     response = { _, response ->
                         if (response.isSuccessful) {
