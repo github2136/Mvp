@@ -6,7 +6,6 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github2136.base.BaseActivity
-import com.github2136.base.BaseRecyclerAdapter
 import com.github2136.base.R
 
 /**

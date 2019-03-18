@@ -1,7 +1,6 @@
 package com.github2136.base.paged
 
 import android.app.Application
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
@@ -10,7 +9,6 @@ import androidx.paging.PageKeyedDataSource
 import androidx.paging.PagedList
 import com.github2136.base.BaseMVPPresenter
 import com.github2136.base.IBaseMVPView
-import kotlin.concurrent.thread
 
 /**
  *  Created by yb on 2018/11/28.

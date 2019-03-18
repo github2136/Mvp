@@ -47,7 +47,12 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getPresenter((this.javaClass.genericSuperclass as ParameterizedType).getActualTypeArguments()[0] as Class<P>)
+        val type = (this.javaClass.genericSuperclass as ParameterizedType).getActualTypeArguments()
+        if (type.size > 1) {
+            getPresenter(type[1] as Class<P>)
+        } else {
+            getPresenter(type[0] as Class<P>)
+        }
         initData(savedInstanceState)
     }
 

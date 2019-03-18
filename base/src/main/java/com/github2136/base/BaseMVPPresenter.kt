@@ -2,13 +2,9 @@ package com.github2136.base
 
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
 import com.github2136.util.JsonUtil
 import com.github2136.util.SPUtil
-import java.lang.ref.WeakReference
 
 /**
  * Created by yb on 2018/11/1.

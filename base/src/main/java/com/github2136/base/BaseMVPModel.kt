@@ -8,7 +8,6 @@ import okhttp3.*
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.*
-import kotlin.experimental.and
 
 /**
  * Created by yb on 2018/11/2.
@@ -29,7 +28,7 @@ open class BaseMVPModel(app: Application, tag: String) {
 
         params?.let {
             urlSb.append("?")
-            for ((key, value) in params) {
+            for ((key, value) in it) {
                 urlSb.append(key)
                 urlSb.append("=")
                 urlSb.append(value)
@@ -55,7 +54,7 @@ open class BaseMVPModel(app: Application, tag: String) {
 
         params?.let {
             urlSb.append("?")
-            for ((key, value) in params) {
+            for ((key, value) in it) {
                 urlSb.append(key)
                 urlSb.append("=")
                 urlSb.append(value)

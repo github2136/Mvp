@@ -2,7 +2,6 @@ package com.github2136.base
 
 import android.os.Bundle
 import android.os.Message
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -11,7 +10,6 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
 import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 
 
 /**
