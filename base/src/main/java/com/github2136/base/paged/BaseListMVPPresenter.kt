@@ -8,12 +8,11 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PageKeyedDataSource
 import androidx.paging.PagedList
 import com.github2136.base.BaseMVPPresenter
-import com.github2136.base.IBaseMVPView
 
 /**
  *  Created by yb on 2018/11/28.
  **/
-abstract class BaseListMVPPresenter<T, V : IBaseMVPView>(app: Application) : BaseMVPPresenter<V>(app) {
+abstract class BaseListMVPPresenter<T>(app: Application) : BaseMVPPresenter(app) {
     //初始化页数量
     open var initSize = 10
     //每页数量

@@ -36,7 +36,7 @@ open class BaseMVPModel(app: Application, tag: String) {
             }
             urlSb.deleteCharAt(urlSb.length - 1)
         }
-        val timestamp = getUTCTime().toString()
+        val timestamp = Date().time.toString()
         val request = Request.Builder()
                 .url(urlSb.toString())
                 .addHeader("X-LC-Id", "3s0xLb9cJWhTWg35ClYDB1y5-gzGzoHsz")
@@ -62,7 +62,7 @@ open class BaseMVPModel(app: Application, tag: String) {
             }
             urlSb.deleteCharAt(urlSb.length - 1)
         }
-        val timestamp = getUTCTime().toString()
+        val timestamp = Date().time.toString()
         val request = Request.Builder()
                 .url(urlSb.toString())
                 .addHeader("X-LC-Id", "3s0xLb9cJWhTWg35ClYDB1y5-gzGzoHsz")
@@ -93,18 +93,6 @@ open class BaseMVPModel(app: Application, tag: String) {
         client.newCall(request).enqueue(callback)
     }
 
-
-    /**
-     * 获取UTC时间
-     *
-     * @return
-     */
-    private fun getUTCTime(): Long {
-        val cal = Calendar.getInstance()
-        cal.timeZone = TimeZone.getTimeZone("UTC")
-        return cal.timeInMillis
-    }
-
     private fun getMD5(msg: String): String {
         val hash: ByteArray
         try {
@@ -115,8 +103,7 @@ open class BaseMVPModel(app: Application, tag: String) {
 
         val hex = StringBuilder(hash.size * 2)
         for (b in hash) {
-            if (b.toInt() and 0xFF < 0x10) hex.append("0")
-            hex.append(Integer.toHexString((b.toInt() and 0xFF)))
+            hex.append(Integer.toHexString(b.toInt() and 0xFF))
         }
         return hex.toString()
     }

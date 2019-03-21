@@ -7,13 +7,12 @@ import com.github2136.base.paged.NetworkState
 import com.github2136.mvp.model.DataModel
 import com.github2136.mvp.model.entity.NetworkData
 import com.github2136.mvp.model.entity.NetworkResult
-import com.github2136.mvp.ui.view.IListView
 import java.util.*
 
 /**
  * Created by yb on 2018/12/5.
  */
-class ListPresenter(private val app: Application) : BaseListMVPPresenter<NetworkData, IListView>(app) {
+class ListPresenter(private val app: Application) : BaseListMVPPresenter<NetworkData>(app) {
     override var initSize = 40
     override fun getDataSource(paramsStr: String): ListDataSource {
         //paramsStr查询时的参数，如果查询时需要则添加到DataSource中
@@ -21,9 +20,9 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
     }
 
     private lateinit var mListModel: DataModel
-    override fun init(v: IListView) {
-        super.init(v)
-        mListModel = DataModel(app, v.toString())
+    override fun init(tag: String) {
+        super.init(tag)
+        mListModel = DataModel(app, tag)
     }
 
     override fun cancelRequest() {

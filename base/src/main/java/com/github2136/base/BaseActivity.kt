@@ -15,7 +15,7 @@ import java.lang.reflect.ParameterizedType
 /**
  * Created by yb on 2018/11/2.
  */
-abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBaseMVPView {
+abstract class BaseActivity<P : BaseMVPPresenter> : AppCompatActivity(){
     protected lateinit var mPresenter: P
     protected val TAG = this.javaClass.name
     protected lateinit var mApp: BaseApplication
@@ -39,6 +39,7 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
             getPresenter(type[0] as Class<P>)
         }
         mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
+        initObserve()
         initData(savedInstanceState)
     }
 
@@ -51,14 +52,14 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
     //获得presenter
     protected fun getPresenter(clazz: Class<P>) {
         this.mPresenter = ViewModelProviders.of(this).get(clazz)
-        (mPresenter as BaseMVPPresenter<IBaseMVPView>).init(this)
+        mPresenter.init(this.toString())
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // Handler
     ///////////////////////////////////////////////////////////////////////////
-    class Handler(activity: BaseActivity<*>) : android.os.Handler() {
-        var weakReference: WeakReference<BaseActivity<*>> = WeakReference(activity)
+   class Handler(activity: BaseActivity<*>) : android.os.Handler() {
+        private var weakReference: WeakReference<BaseActivity<*>> = WeakReference(activity)
 
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
@@ -126,18 +127,6 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
         }
     }
 
-    // 显示进度框
-    override fun showProgressDialog() {}
-
-    // 显示进度框
-    override fun showProgressDialog(@StringRes resId: Int) {}
-
-    // 显示进度框
-    override fun showProgressDialog(msg: String) {}
-
-    // 关闭进度框
-    override fun dismissDialog() {}
-
     protected fun handleMessage(msg: Message) {}
 
     //布局ID
@@ -145,6 +134,9 @@ abstract class BaseActivity<P : BaseMVPPresenter<*>> : AppCompatActivity(), IBas
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)
+
+    //初始化回调
+    protected abstract fun initObserve()
 
     //取消请求
     protected fun cancelRequest() {

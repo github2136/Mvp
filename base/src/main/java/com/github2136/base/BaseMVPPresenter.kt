@@ -9,14 +9,14 @@ import com.github2136.util.SPUtil
 /**
  * Created by yb on 2018/11/1.
  */
-abstract class BaseMVPPresenter<V : IBaseMVPView>(app: Application) : AndroidViewModel(app) {
-    protected lateinit var mView: V
-    protected val failedStr = "无法连接服务器"
+abstract class BaseMVPPresenter(app: Application) : AndroidViewModel(app) {
+    protected lateinit var mTag: String
+    val failedStr = "无法连接服务器"
     protected var mJsonUtil: JsonUtil = JsonUtil.instance
     protected var mSpUtil: SPUtil = SPUtil.getInstance(app)
 
-    open fun init(v: V) {
-        mView = v
+    open fun init(tag: String) {
+        mTag = tag
     }
 
     //取消请求

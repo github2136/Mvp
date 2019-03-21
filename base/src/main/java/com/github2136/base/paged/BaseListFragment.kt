@@ -5,20 +5,16 @@ import androidx.lifecycle.Observer
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.github2136.base.BaseActivity
+import com.github2136.base.BaseFragment
 import com.github2136.base.R
 
-/**
- * Created by yb on 2018/11/28.
- */
-abstract class BaseListActivity<T, P : BaseListMVPPresenter<T>> : BaseActivity<P>() {
+abstract class BaseListFragment<T, P : BaseListMVPPresenter<T>> : BaseFragment<P>() {
     protected lateinit var rvContent: RecyclerView
     protected lateinit var srContent: SwipeRefreshLayout
     protected lateinit var mAdapter: BaseListAdapter<T>
-
     override fun initData(savedInstanceState: Bundle?) {
-        srContent = findViewById(R.id.sr_content)
-        rvContent = findViewById(R.id.rv_content)
+        srContent = view!!.findViewById(R.id.sr_content)
+        rvContent = view!!.findViewById(R.id.rv_content)
 
         mAdapter = getAdapter()
         mAdapter.setOnItemClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }

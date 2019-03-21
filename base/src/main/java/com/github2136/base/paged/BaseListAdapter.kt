@@ -74,7 +74,7 @@ abstract class BaseListAdapter<T>(private val retryCallback: () -> Unit, diffCal
             mLayoutInflater = LayoutInflater.from(parent.context)
         }
         return when (viewType) {
-            R.layout.item_network_empty -> NetworkStateItemViewHolder.create(parent, viewType, { })
+            R.layout.item_network_empty -> NetworkStateItemViewHolder.create(parent, viewType) { }
             R.layout.item_network_failed -> NetworkStateItemViewHolder.create(parent, viewType, retryCallback)
             R.layout.item_network_state -> NetworkStateItemViewHolder.create(parent, viewType, retryCallback)
             else -> ViewHolderRecyclerView(mLayoutInflater.inflate(getLayoutId(viewType), parent, false), itemClickListener, itemLongClickListener)

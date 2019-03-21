@@ -17,7 +17,7 @@ import java.lang.reflect.ParameterizedType
 /**
  * Created by yb on 2018/11/2.
  */
-abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView {
+abstract class BaseFragment<P : BaseMVPPresenter> : Fragment() {
     protected val TAG = this.javaClass.name
     protected lateinit var mPresenter: P
     protected lateinit var mContext: Context
@@ -47,19 +47,20 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val type = (this.javaClass.genericSuperclass as ParameterizedType).getActualTypeArguments()
+        val type = (this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments
         if (type.size > 1) {
             getPresenter(type[1] as Class<P>)
         } else {
             getPresenter(type[0] as Class<P>)
         }
+        initObserve()
         initData(savedInstanceState)
     }
 
     //获得presenter
     protected fun getPresenter(clazz: Class<P>) {
         this.mPresenter = ViewModelProviders.of(this).get(clazz)
-        (mPresenter as BaseMVPPresenter<IBaseMVPView>).init(this)
+        (mPresenter as BaseMVPPresenter).init(this.toString())
     }
 
     override fun onDestroyView() {
@@ -126,18 +127,6 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
         }
     }
 
-    // 显示进度框
-    override fun showProgressDialog() {}
-
-    // 显示进度框
-    override fun showProgressDialog(@StringRes resId: Int) {}
-
-    // 显示进度框
-    override fun showProgressDialog(msg: String) {}
-
-    // 关闭进度框
-    override fun dismissDialog() {}
-
     ///////////////////////////////////////////////////////////////////////////
     // Handler
     ///////////////////////////////////////////////////////////////////////////
@@ -157,6 +146,9 @@ abstract class BaseFragment<P : BaseMVPPresenter<*>> : Fragment(), IBaseMVPView 
 
     //初始化
     protected abstract fun initData(savedInstanceState: Bundle?)
+
+    //初始化回调
+    protected abstract fun initObserve()
 
     //取消请求
     fun cancelRequest() {}

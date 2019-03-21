@@ -7,5 +7,4 @@ data class NetworkData(
         val objectId: String,
         val name: String,
         val rowNumber: String
-) {
-}
+)
