@@ -1,18 +1,18 @@
 package com.github2136.base.paged
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
-import androidx.paging.PageKeyedDataSource
 import androidx.paging.PagedList
 import com.github2136.base.BaseMVPPresenter
 
 /**
  *  Created by yb on 2018/11/28.
  **/
-abstract class BaseListMVPPresenter<T>(app: Application) : BaseMVPPresenter(app) {
+abstract class BaseListDBMVPPresenter<T>(app: Application) : BaseMVPPresenter(app) {
     //初始化页数量一般为默认大小3倍
     open var initSize = 30
     //每页数量
@@ -36,51 +36,40 @@ abstract class BaseListMVPPresenter<T>(app: Application) : BaseMVPPresenter(app)
     }
 
     private fun getList(paramsStr: String): Listing<T> {
-        val sourceFactory = ListDataSourceFactory(paramsStr)
+        val dn = getBoundaryCallback()
         val livePagedList = LivePagedListBuilder(
-                sourceFactory,
+                getDBSource(),
                 PagedList.Config.Builder()
                         .setInitialLoadSizeHint(initSize)
-                        .setPrefetchDistance(prefetchSize)
                         .setPageSize(pageSize)
-                        .build()
-        ).build()
-        val refreshState = Transformations.switchMap(sourceFactory.sourceLiveData) {
-            it.initialLoad
-        }
+                        .setPrefetchDistance(prefetchSize)
+                        .setEnablePlaceholders(false)
+                        .build())
+                .setBoundaryCallback(dn)
+                .build()
+        val refreshState = dn.initialLoad
         return Listing(
                 pagedList = livePagedList,
-                networkState = Transformations.switchMap(sourceFactory.sourceLiveData) {
-                    it.networkState
-                },
+                networkState = dn.networkState,
                 retry = {
-                    sourceFactory.sourceLiveData.value?.retryAllFailed()
+                    dn.retryAllFailed()
                 },
                 refresh = {
-                    sourceFactory.sourceLiveData.value?.invalidate()
+                    dn.onZeroItemsLoaded()
                 },
                 refreshState = refreshState
         )
     }
 
     fun get(params: String = "") {
-        this@BaseListMVPPresenter.params.value = params
+        this@BaseListDBMVPPresenter.params.value = params
     }
 
-    inner class ListDataSourceFactory(private val paramsStr: String) : DataSource.Factory<Int, T>() {
-        val sourceLiveData = MutableLiveData<ListDataSource>()
-        override fun create(): DataSource<Int, T> {
-            val source = getDataSource(paramsStr)
-            sourceLiveData.postValue(source)
-            return source
-        }
-    }
-
-    abstract inner class ListDataSource : PageKeyedDataSource<Int, T>() {
+    abstract inner class DNBoundaryCallback : PagedList.BoundaryCallback<T>() {
         val networkState = MutableLiveData<NetworkState>()
         val initialLoad = MutableLiveData<NetworkState>()
         var retry: (() -> Any)? = null
-
+        val helper = PagingRequestHelper(executor)
         fun retryAllFailed() {
             val prevRetry = retry
             retry = null
@@ -90,13 +79,10 @@ abstract class BaseListMVPPresenter<T>(app: Application) : BaseMVPPresenter(app)
                 }
             }
         }
-
-        override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, T>) {}
-
-        override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, T>) {}
-
-        override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, T>) {}
     }
 
-    abstract fun getDataSource(paramsStr: String): ListDataSource
+    abstract fun getBoundaryCallback(): DNBoundaryCallback
+    //本地数据库数据
+    abstract fun getDBSource(): DataSource.Factory<Int, T>
+
 }

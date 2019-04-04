@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -24,6 +25,10 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
+    api "androidx.room:room-runtime:2.1.0-alpha02"
+    testImplementation "androidx.room:room-testing:2.1.0-alpha02"
+    kapt "androidx.room:room-compiler:2.1.0-alpha02" // use kapt for Kotlin
     testImplementation 'junit:junit:4.12'
     implementation project(':base')
 }

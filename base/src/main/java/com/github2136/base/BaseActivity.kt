@@ -32,7 +32,7 @@ abstract class BaseActivity<P : BaseMVPPresenter> : AppCompatActivity(){
         setContentView(getLayoutId())
         mHandler = Handler(this)
 
-        val type = (this.javaClass.genericSuperclass as ParameterizedType).getActualTypeArguments()
+        val type = (this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments
         if (type.size > 1) {
             getPresenter(type[1] as Class<P>)
         } else {

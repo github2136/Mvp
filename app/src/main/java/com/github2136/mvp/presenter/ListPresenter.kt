@@ -1,6 +1,7 @@
 package com.github2136.mvp.presenter
 
 import android.app.Application
+import android.util.Log
 import androidx.collection.ArrayMap
 import com.github2136.base.paged.BaseListMVPPresenter
 import com.github2136.base.paged.NetworkState
@@ -31,11 +32,14 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
 
     inner class LDataSource : ListDataSource() {
         override fun loadInitial(params: LoadInitialParams<Int>, callback: LoadInitialCallback<Int, NetworkData>) {
+            Log.e("LDataSource", "loadInitial ${params.requestedLoadSize}")
             //首页初始化数据必须使用同步方法
             initialLoad.postValue(NetworkState.LOADING)
             val p = ArrayMap<String, Any>()
-            p["limit"] = params.requestedLoadSize
+            p["limit"] = initSize
             p["skip"] = 0
+            p["order"] = "rowNumber"
+            p["where"] = "{\"\$or\":[{\"valid\":{\"\$exists\":false}},{\"\$and\":[{\"valid\":{\"\$exists\":true}},{\"valid\":true}]}]}"
             val response = mListModel.getList(p, true)
 
             if (Random().nextBoolean() && response?.isSuccessful == true) {
@@ -57,10 +61,13 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
         }
 
         override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, NetworkData>) {
+            Log.e("LDataSource", "loadAfter ${params.requestedLoadSize}")
             networkState.postValue(NetworkState.LOADING)
             val p = ArrayMap<String, Any>()
             p["limit"] = params.requestedLoadSize
             p["skip"] = params.key * params.requestedLoadSize + initSize
+            p["order"] = "rowNumber"
+            p["where"] = "{\"\$or\":[{\"valid\":{\"\$exists\":false}},{\"\$and\":[{\"valid\":{\"\$exists\":true}},{\"valid\":true}]}]}"
             mListModel.getList(p,
                     response = { _, response ->
                         if (response.isSuccessful) {
@@ -85,6 +92,10 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
                         }
                         networkState.postValue(NetworkState.error(failedStr))
                     })
+        }
+
+        override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, NetworkData>) {
+            Log.e("LDataSource", "loadBefore ${params.requestedLoadSize}")
         }
     }
 }

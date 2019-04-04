@@ -18,6 +18,12 @@
         android:text="列表"/>
 
     <Button
+        android:id="@+id/btn_list2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="列表2"/>
+
+    <Button
         android:id="@+id/btn_retry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

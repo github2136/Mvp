@@ -21,6 +21,7 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
         mPresenter.get()
         btn_retry.setOnClickListener(this)
         btn_list.setOnClickListener(this)
+        btn_list2.setOnClickListener(this)
     }
 
     override fun initObserve() {
@@ -40,6 +41,9 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
             }
             R.id.btn_list -> {
                 startActivity(Intent(this, ListActivity::class.java))
+            }
+            R.id.btn_list2 -> {
+                startActivity(Intent(this, DBListActivity::class.java))
             }
             else -> {
             }

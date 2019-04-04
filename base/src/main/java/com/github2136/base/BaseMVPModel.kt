@@ -103,6 +103,7 @@ open class BaseMVPModel(app: Application, tag: String) {
 
         val hex = StringBuilder(hash.size * 2)
         for (b in hash) {
+            if (b.toInt() and 0xFF < 0x10) hex.append("0")
             hex.append(Integer.toHexString(b.toInt() and 0xFF))
         }
         return hex.toString()

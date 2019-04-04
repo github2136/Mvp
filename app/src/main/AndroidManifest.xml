@@ -11,6 +11,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ui.activity.DBListActivity">
+        </activity>
+
         <meta-data
             android:name="util_sp_name"
             android:value="mvp"/>
