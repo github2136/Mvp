@@ -15,7 +15,7 @@ import java.lang.reflect.ParameterizedType
 /**
  * Created by yb on 2018/11/2.
  */
-abstract class BaseActivity<P : BaseMVPPresenter> : AppCompatActivity(){
+abstract class BaseActivity<P : BaseMVPPresenter> : AppCompatActivity() {
     protected lateinit var mPresenter: P
     protected val TAG = this.javaClass.name
     protected lateinit var mApp: BaseApplication
@@ -58,7 +58,7 @@ abstract class BaseActivity<P : BaseMVPPresenter> : AppCompatActivity(){
     ///////////////////////////////////////////////////////////////////////////
     // Handler
     ///////////////////////////////////////////////////////////////////////////
-   class Handler(activity: BaseActivity<*>) : android.os.Handler() {
+    class Handler(activity: BaseActivity<*>) : android.os.Handler() {
         private var weakReference: WeakReference<BaseActivity<*>> = WeakReference(activity)
 
         override fun handleMessage(msg: Message) {
@@ -127,7 +127,7 @@ abstract class BaseActivity<P : BaseMVPPresenter> : AppCompatActivity(){
         }
     }
 
-    protected fun handleMessage(msg: Message) {}
+    protected open fun handleMessage(msg: Message) {}
 
     //布局ID
     protected abstract fun getLayoutId(): Int

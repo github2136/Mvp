@@ -10,14 +10,8 @@ import com.github2136.mvp.model.DataModel
  * Created by yb on 2018/11/2.
  */
 class MainPresenter(private val app: Application) : BaseMVPPresenter(app) {
-    private lateinit var mDataModel: DataModel
+    private val mDataModel: DataModel  by lazy { DataModel(app, mTag) }
     val ldGet: MutableLiveData<CallbackData> = MutableLiveData()
-
-
-    override fun init(tag: String) {
-        super.init(tag)
-        mDataModel = DataModel(app, tag)
-    }
 
     fun get() {
         mDataModel.getStr(

@@ -17,6 +17,9 @@
         <meta-data
             android:name="util_sp_name"
             android:value="mvp"/>
+        <meta-data
+            android:name="util_project_path"
+            android:value="mvp"/>
 
         <activity android:name=".ui.activity.MainActivity">
             <intent-filter>

@@ -20,11 +20,7 @@ class ListPresenter(private val app: Application) : BaseListMVPPresenter<Network
         return LDataSource()
     }
 
-    private lateinit var mListModel: DataModel
-    override fun init(tag: String) {
-        super.init(tag)
-        mListModel = DataModel(app, tag)
-    }
+    private val mListModel: DataModel by lazy { DataModel(app, mTag) }
 
     override fun cancelRequest() {
         mListModel.cancelRequest()

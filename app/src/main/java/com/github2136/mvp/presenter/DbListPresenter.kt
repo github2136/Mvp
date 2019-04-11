@@ -21,12 +21,8 @@ import java.lang.RuntimeException
 
 class DbListPresenter(private val app: Application) : BaseListDBMVPPresenter<NetworkData>(app) {
     //    override var initSize = 40
-    private lateinit var mListModel: DataModel
+    private val mListModel: DataModel by lazy { DataModel(app, mTag) }
 
-    override fun init(tag: String) {
-        super.init(tag)
-        mListModel = DataModel(app, tag)
-    }
 
     override fun getDBSource(): DataSource.Factory<Int, NetworkData> = DBHelper.getInstance(app).networkDataDao().getAllData()
 
