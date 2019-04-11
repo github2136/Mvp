@@ -4,7 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.collection.ArrayMap
 import androidx.paging.DataSource
-import com.github2136.base.paged.BaseListDBMVPPresenter
+import com.github2136.base.paged.BaseListDbPresenter
 import com.github2136.base.paged.NetworkState
 import com.github2136.base.paged.PagingRequestHelper
 import com.github2136.base.paged.executor
@@ -12,14 +12,9 @@ import com.github2136.mvp.model.DataModel
 import com.github2136.mvp.model.db.DBHelper
 import com.github2136.mvp.model.entity.NetworkData
 import com.github2136.mvp.model.entity.NetworkResult
-import com.google.gson.Gson
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import java.io.IOException
 import java.lang.RuntimeException
 
-class DbListPresenter(private val app: Application) : BaseListDBMVPPresenter<NetworkData>(app) {
+class DbListPresenter(private val app: Application) : BaseListDbPresenter<NetworkData>(app) {
     //    override var initSize = 40
     private val mListModel: DataModel by lazy { DataModel(app, mTag) }
 

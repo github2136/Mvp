@@ -11,7 +11,7 @@ import com.github2136.base.R
 /**
  * Created by yb on 2018/11/28.
  */
-abstract class BaseListActivity<T, P : BaseListMVPPresenter<T>> : BaseActivity<P>() {
+abstract class BaseListActivity<T, P : BaseListPresenter<T>> : BaseActivity<P>() {
     protected lateinit var rvContent: RecyclerView
     protected lateinit var srContent: SwipeRefreshLayout
     protected lateinit var mAdapter: BaseListAdapter<T>

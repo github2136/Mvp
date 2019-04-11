@@ -3,7 +3,7 @@ package com.github2136.mvp.presenter
 import android.app.Application
 import android.util.Log
 import androidx.collection.ArrayMap
-import com.github2136.base.paged.BaseListMVPPresenter
+import com.github2136.base.paged.BaseListPresenter
 import com.github2136.base.paged.NetworkState
 import com.github2136.mvp.model.DataModel
 import com.github2136.mvp.model.entity.NetworkData
@@ -13,7 +13,7 @@ import java.util.*
 /**
  * Created by yb on 2018/12/5.
  */
-class ListPresenter(private val app: Application) : BaseListMVPPresenter<NetworkData>(app) {
+class ListPresenter(private val app: Application) : BaseListPresenter<NetworkData>(app) {
     override var initSize = 40
     override fun getDataSource(paramsStr: String): ListDataSource {
         //paramsStr查询时的参数，如果查询时需要则添加到DataSource中

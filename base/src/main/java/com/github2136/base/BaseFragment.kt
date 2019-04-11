@@ -17,7 +17,7 @@ import java.lang.reflect.ParameterizedType
 /**
  * Created by yb on 2018/11/2.
  */
-abstract class BaseFragment<P : BaseMVPPresenter> : Fragment() {
+abstract class BaseFragment<P : BasePresenter> : Fragment() {
     protected val TAG = this.javaClass.name
     protected lateinit var mPresenter: P
     protected lateinit var mContext: Context
@@ -60,7 +60,7 @@ abstract class BaseFragment<P : BaseMVPPresenter> : Fragment() {
     //获得presenter
     protected fun getPresenter(clazz: Class<P>) {
         this.mPresenter = ViewModelProviders.of(this).get(clazz)
-        (mPresenter as BaseMVPPresenter).init(this.toString())
+        (mPresenter as BasePresenter).init(this.toString())
     }
 
     override fun onDestroyView() {

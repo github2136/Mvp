@@ -9,7 +9,7 @@ import com.github2136.util.SPUtil
 /**
  * Created by yb on 2018/11/1.
  */
-abstract class BaseMVPPresenter(app: Application) : AndroidViewModel(app) {
+abstract class BasePresenter(app: Application) : AndroidViewModel(app) {
     protected lateinit var mTag: String
     val failedStr = "无法连接服务器"
     protected var mJsonUtil: JsonUtil = JsonUtil.instance

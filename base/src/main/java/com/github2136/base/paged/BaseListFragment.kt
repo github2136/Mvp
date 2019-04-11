@@ -8,7 +8,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github2136.base.BaseFragment
 import com.github2136.base.R
 
-abstract class BaseListFragment<T, P : BaseListMVPPresenter<T>> : BaseFragment<P>() {
+abstract class BaseListFragment<T, P : BaseListPresenter<T>> : BaseFragment<P>() {
     protected lateinit var rvContent: RecyclerView
     protected lateinit var srContent: SwipeRefreshLayout
     protected lateinit var mAdapter: BaseListAdapter<T>

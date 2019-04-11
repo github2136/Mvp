@@ -2,14 +2,14 @@ package com.github2136.mvp.presenter
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import com.github2136.base.BaseMVPPresenter
+import com.github2136.base.BasePresenter
 import com.github2136.base.CallbackData
 import com.github2136.mvp.model.DataModel
 
 /**
  * Created by yb on 2018/11/2.
  */
-class MainPresenter(private val app: Application) : BaseMVPPresenter(app) {
+class MainPresenter(private val app: Application) : BasePresenter(app) {
     private val mDataModel: DataModel  by lazy { DataModel(app, mTag) }
     val ldGet: MutableLiveData<CallbackData> = MutableLiveData()
 

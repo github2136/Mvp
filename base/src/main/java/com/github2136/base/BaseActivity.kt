@@ -15,7 +15,7 @@ import java.lang.reflect.ParameterizedType
 /**
  * Created by yb on 2018/11/2.
  */
-abstract class BaseActivity<P : BaseMVPPresenter> : AppCompatActivity() {
+abstract class BaseActivity<P : BasePresenter> : AppCompatActivity() {
     protected lateinit var mPresenter: P
     protected val TAG = this.javaClass.name
     protected lateinit var mApp: BaseApplication

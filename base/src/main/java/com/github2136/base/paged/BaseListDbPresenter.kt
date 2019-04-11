@@ -1,18 +1,17 @@
 package com.github2136.base.paged
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.github2136.base.BaseMVPPresenter
+import com.github2136.base.BasePresenter
 
 /**
  *  Created by yb on 2018/11/28.
  **/
-abstract class BaseListDBMVPPresenter<T>(app: Application) : BaseMVPPresenter(app) {
+abstract class BaseListDbPresenter<T>(app: Application) : BasePresenter(app) {
     //初始化页数量一般为默认大小3倍
     open var initSize = 30
     //每页数量
@@ -62,7 +61,7 @@ abstract class BaseListDBMVPPresenter<T>(app: Application) : BaseMVPPresenter(ap
     }
 
     fun get(params: String = "") {
-        this@BaseListDBMVPPresenter.params.value = params
+        this@BaseListDbPresenter.params.value = params
     }
 
     abstract inner class DNBoundaryCallback : PagedList.BoundaryCallback<T>() {

@@ -13,7 +13,7 @@ import java.util.*
 /**
  * Created by yb on 2018/11/2.
  */
-open class BaseMVPModel(app: Application, tag: String) {
+open class BaseModel(app: Application, tag: String) {
     protected var client: OkHttpClient = OkHttpClient()
     protected var mApp: Application = app
 

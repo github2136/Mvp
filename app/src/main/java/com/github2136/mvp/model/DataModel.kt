@@ -2,7 +2,7 @@ package com.github2136.mvp.model
 
 import android.app.Application
 import androidx.collection.ArrayMap
-import com.github2136.base.BaseMVPModel
+import com.github2136.base.BaseModel
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
@@ -11,7 +11,7 @@ import java.io.IOException
 /**
  * Created by yb on 2018/11/28.
  */
-class DataModel(app: Application, tag: String) : BaseMVPModel(app, tag) {
+class DataModel(app: Application, tag: String) : BaseModel(app, tag) {
     fun getStr(response: (call: Call, response: Response) -> Unit, failure: (call: Call, e: IOException) -> Unit) {
         httpGet("http://www.baidu.com", "", null, object : Callback {
             override fun onFailure(call: Call, e: IOException) = failure(call, e)
