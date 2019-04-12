@@ -3,6 +3,7 @@ package com.github2136.base
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import com.github2136.util.JsonUtil
 import com.github2136.util.SPUtil
 
@@ -14,7 +15,8 @@ abstract class BasePresenter(app: Application) : AndroidViewModel(app) {
     val failedStr = "无法连接服务器"
     protected var mJsonUtil: JsonUtil = JsonUtil.instance
     protected var mSpUtil: SPUtil = SPUtil.getInstance(app)
-
+    //显示dialog
+    val ldDialog = MutableLiveData<String>()
     open fun init(tag: String) {
         mTag = tag
     }

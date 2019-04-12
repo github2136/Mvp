@@ -1,11 +1,15 @@
 package com.github2136.base
 
+import android.app.ProgressDialog
+import android.os.Build
 import android.os.Bundle
 import android.os.Message
+import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
@@ -22,7 +26,11 @@ abstract class BaseActivity<P : BasePresenter> : AppCompatActivity() {
     protected lateinit var mActivity: BaseActivity<P>
     protected lateinit var mHandler: Handler
     protected var mToast: Toast? = null
-
+    protected val mDialog: ProgressDialog by lazy {
+        val dialog = ProgressDialog(this)
+        dialog.setCancelable(false)
+        dialog
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +47,7 @@ abstract class BaseActivity<P : BasePresenter> : AppCompatActivity() {
             getPresenter(type[0] as Class<P>)
         }
         mToast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
+        mPresenter.ldDialog.observe(this, Observer { str -> showDialog(str) })
         initObserve()
         initData(savedInstanceState)
     }
@@ -124,6 +133,25 @@ abstract class BaseActivity<P : BasePresenter> : AppCompatActivity() {
             it.setText(resId)
             it.duration = Toast.LENGTH_LONG
             it.show()
+        }
+    }
+
+    open fun showDialog(msg: String?) {
+        if (!TextUtils.isEmpty(msg)) {
+            mDialog.setMessage(msg)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                if (!isDestroyed || !isFinishing) {
+                    mDialog.show()
+                }
+            } else {
+                if (!isFinishing) {
+                    mDialog.show()
+                }
+            }
+        } else {
+            if (mDialog.isShowing) {
+                mDialog.dismiss()
+            }
         }
     }
 
