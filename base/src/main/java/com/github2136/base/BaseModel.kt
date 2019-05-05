@@ -14,7 +14,11 @@ import java.util.*
  * Created by yb on 2018/11/2.
  */
 open class BaseModel(app: Application, tag: String) {
-    protected var client: OkHttpClient = OkHttpClient()
+    protected val client: OkHttpClient by lazy {
+        OkHttpClient().newBuilder()
+            .addNetworkInterceptor(OkHttpInterceptor())
+            .build()
+    }
     protected var mApp: Application = app
 
     protected var mTag: String = tag
