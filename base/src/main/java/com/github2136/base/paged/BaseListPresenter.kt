@@ -7,6 +7,7 @@ import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PageKeyedDataSource
 import androidx.paging.PagedList
+import com.github2136.base.BaseApplication
 import com.github2136.base.BasePresenter
 
 /**
@@ -16,11 +17,13 @@ abstract class BaseListPresenter<T>(app: Application) : BasePresenter(app) {
     //初始化页数量一般为默认大小3倍
     open var initSize = 30
     //每页数量
-    open var pageSize = 10
+    open var pageSize = 30
     //提前XX数量项开始查询一般为pagesize的整数倍
     open var prefetchSize = 30
     private val params = MutableLiveData<Array<Any>>()
-    private val repoResult = Transformations.map(params) { getList(it) }
+    private val repoResult = Transformations.map(params) {
+        getList(*it)
+    }
 
     val list = Transformations.switchMap(repoResult) { it.pagedList }
     val networkState = Transformations.switchMap(repoResult) { it.networkState }
@@ -36,7 +39,7 @@ abstract class BaseListPresenter<T>(app: Application) : BasePresenter(app) {
     }
 
     private fun getList(vararg paramsStr: Any): Listing<T> {
-        val sourceFactory = ListDataSourceFactory(paramsStr)
+        val sourceFactory = ListDataSourceFactory(*paramsStr)
         val livePagedList = LivePagedListBuilder(
             sourceFactory,
             PagedList.Config.Builder()
@@ -70,7 +73,7 @@ abstract class BaseListPresenter<T>(app: Application) : BasePresenter(app) {
     inner class ListDataSourceFactory(private vararg val paramsStr: Any) : DataSource.Factory<Int, T>() {
         val sourceLiveData = MutableLiveData<ListDataSource>()
         override fun create(): DataSource<Int, T> {
-            val source = getDataSource(paramsStr)
+            val source = getDataSource(*paramsStr)
             sourceLiveData.postValue(source)
             return source
         }
