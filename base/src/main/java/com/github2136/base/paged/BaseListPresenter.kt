@@ -64,7 +64,7 @@ abstract class BaseListPresenter<T>(app: Application) : BasePresenter(app) {
     }
 
     fun get(vararg params: Any) {
-        this@BaseListPresenter.params.value = arrayOf(params)
+        this@BaseListPresenter.params.value = arrayOf(*params)
     }
 
     inner class ListDataSourceFactory(private vararg val paramsStr: Any) : DataSource.Factory<Int, T>() {
