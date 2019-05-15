@@ -19,7 +19,7 @@ abstract class BaseListPresenter<T>(app: Application) : BasePresenter(app) {
     open var pageSize = 10
     //提前XX数量项开始查询一般为pagesize的整数倍
     open var prefetchSize = 30
-    private val params = MutableLiveData<String>()
+    private val params = MutableLiveData<Array<Any>>()
     private val repoResult = Transformations.map(params) { getList(it) }
 
     val list = Transformations.switchMap(repoResult) { it.pagedList }
@@ -35,39 +35,39 @@ abstract class BaseListPresenter<T>(app: Application) : BasePresenter(app) {
         listing?.retry?.invoke()
     }
 
-    private fun getList(paramsStr: String): Listing<T> {
+    private fun getList(vararg paramsStr: Any): Listing<T> {
         val sourceFactory = ListDataSourceFactory(paramsStr)
         val livePagedList = LivePagedListBuilder(
-                sourceFactory,
-                PagedList.Config.Builder()
-                        .setInitialLoadSizeHint(initSize)
-                        .setPrefetchDistance(prefetchSize)
-                        .setPageSize(pageSize)
-                        .build()
+            sourceFactory,
+            PagedList.Config.Builder()
+                .setInitialLoadSizeHint(initSize)
+                .setPrefetchDistance(prefetchSize)
+                .setPageSize(pageSize)
+                .build()
         ).build()
         val refreshState = Transformations.switchMap(sourceFactory.sourceLiveData) {
             it.initialLoad
         }
         return Listing(
-                pagedList = livePagedList,
-                networkState = Transformations.switchMap(sourceFactory.sourceLiveData) {
-                    it.networkState
-                },
-                retry = {
-                    sourceFactory.sourceLiveData.value?.retryAllFailed()
-                },
-                refresh = {
-                    sourceFactory.sourceLiveData.value?.invalidate()
-                },
-                refreshState = refreshState
+            pagedList = livePagedList,
+            networkState = Transformations.switchMap(sourceFactory.sourceLiveData) {
+                it.networkState
+            },
+            retry = {
+                sourceFactory.sourceLiveData.value?.retryAllFailed()
+            },
+            refresh = {
+                sourceFactory.sourceLiveData.value?.invalidate()
+            },
+            refreshState = refreshState
         )
     }
 
-    fun get(params: String = "") {
-        this@BaseListPresenter.params.value = params
+    fun get(vararg params: Any) {
+        this@BaseListPresenter.params.value = arrayOf(params)
     }
 
-    inner class ListDataSourceFactory(private val paramsStr: String) : DataSource.Factory<Int, T>() {
+    inner class ListDataSourceFactory(private vararg val paramsStr: Any) : DataSource.Factory<Int, T>() {
         val sourceLiveData = MutableLiveData<ListDataSource>()
         override fun create(): DataSource<Int, T> {
             val source = getDataSource(paramsStr)
@@ -98,5 +98,5 @@ abstract class BaseListPresenter<T>(app: Application) : BasePresenter(app) {
         override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, T>) {}
     }
 
-    abstract fun getDataSource(paramsStr: String): ListDataSource
+    abstract fun getDataSource(vararg paramsStr: Any): ListDataSource
 }

@@ -15,7 +15,8 @@ import java.util.*
  */
 class ListPresenter(private val app: Application) : BaseListPresenter<NetworkData>(app) {
     override var initSize = 40
-    override fun getDataSource(paramsStr: String): ListDataSource {
+
+    override fun getDataSource(vararg paramsStr: Any): ListDataSource {
         //paramsStr查询时的参数，如果查询时需要则添加到DataSource中
         return LDataSource()
     }
@@ -65,29 +66,29 @@ class ListPresenter(private val app: Application) : BaseListPresenter<NetworkDat
             p["order"] = "rowNumber"
             p["where"] = "{\"\$or\":[{\"valid\":{\"\$exists\":false}},{\"\$and\":[{\"valid\":{\"\$exists\":true}},{\"valid\":true}]}]}"
             mListModel.getList(p,
-                    response = { _, response ->
-                        if (response.isSuccessful) {
-                            retry = null
-                            response.body()?.string()?.let {
-                                val list = mJsonUtil.getObjectByStr(it, NetworkResult::class.java)
-                                list?.let {
-                                    callback.onResult(it.results, params.key + 1)
-                                }
-                            }
-                            networkState.postValue(NetworkState.LOADED)
-                        } else {
-                            retry = {
-                                loadAfter(params, callback)
-                            }
-                            networkState.postValue(NetworkState.error(failedStr))
-                        }
-                    },
-                    failure = { _, _ ->
-                        retry = {
-                            loadAfter(params, callback)
-                        }
-                        networkState.postValue(NetworkState.error(failedStr))
-                    })
+                               response = { _, response ->
+                                   if (response.isSuccessful) {
+                                       retry = null
+                                       response.body()?.string()?.let {
+                                           val list = mJsonUtil.getObjectByStr(it, NetworkResult::class.java)
+                                           list?.let {
+                                               callback.onResult(it.results, params.key + 1)
+                                           }
+                                       }
+                                       networkState.postValue(NetworkState.LOADED)
+                                   } else {
+                                       retry = {
+                                           loadAfter(params, callback)
+                                       }
+                                       networkState.postValue(NetworkState.error(failedStr))
+                                   }
+                               },
+                               failure = { _, _ ->
+                                   retry = {
+                                       loadAfter(params, callback)
+                                   }
+                                   networkState.postValue(NetworkState.error(failedStr))
+                               })
         }
 
         override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, NetworkData>) {
