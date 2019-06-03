@@ -11,16 +11,15 @@ import com.github2136.base.R
 /**
  * Created by yb on 2018/11/28.
  */
+@Deprecated("不能重新加载第一页")
 abstract class BaseListDBActivity<T, P : BaseListDbPresenter<T>> : BaseActivity<P>() {
-    protected lateinit var rvContent: RecyclerView
-    protected lateinit var srContent: SwipeRefreshLayout
-    protected lateinit var mAdapter: BaseListAdapter<T>
+    protected val rvContent by lazy { findViewById<RecyclerView>(R.id.rv_content) }
+    protected val srContent by lazy { findViewById<SwipeRefreshLayout>(R.id.sr_content) }
+    protected val mAdapter by lazy { getAdapter() }
 
     override fun initData(savedInstanceState: Bundle?) {
-        srContent = findViewById(R.id.sr_content)
-        rvContent = findViewById(R.id.rv_content)
         rvContent.itemAnimator = null
-        mAdapter = getAdapter()
+
         mAdapter.setOnItemClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
         mAdapter.setOnItemLongClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
 

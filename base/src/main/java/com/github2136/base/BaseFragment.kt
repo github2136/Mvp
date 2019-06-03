@@ -21,7 +21,7 @@ abstract class BaseFragment<P : BasePresenter> : Fragment() {
     protected val TAG = this.javaClass.name
     protected lateinit var mPresenter: P
     protected lateinit var mContext: Context
-    protected lateinit var mHandler: Handler
+    protected val mHandler by lazy { Handler(this) }
     protected var mToast: Toast? = null
 
 
@@ -36,11 +36,12 @@ abstract class BaseFragment<P : BasePresenter> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mHandler = Handler(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(getViewResId(), container, false)
     }
 

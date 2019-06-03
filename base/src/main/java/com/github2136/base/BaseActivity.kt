@@ -22,9 +22,9 @@ import java.lang.reflect.ParameterizedType
 abstract class BaseActivity<P : BasePresenter> : AppCompatActivity() {
     protected lateinit var mPresenter: P
     protected val TAG = this.javaClass.name
-    protected lateinit var mApp: BaseApplication
-    protected lateinit var mActivity: BaseActivity<P>
-    protected lateinit var mHandler: Handler
+    protected val mApp by lazy { application as BaseApplication }
+    protected val mActivity by lazy { this }
+    protected val mHandler by lazy { Handler(this) }
     protected var mToast: Toast? = null
     protected val mDialog: ProgressDialog by lazy {
         val dialog = ProgressDialog(this)
@@ -34,11 +34,8 @@ abstract class BaseActivity<P : BasePresenter> : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mApp = application as BaseApplication
         mApp.addActivity(this)
-        mActivity = this
         setContentView(getLayoutId())
-        mHandler = Handler(this)
 
         val type = (this.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments
         if (type.size > 1) {
