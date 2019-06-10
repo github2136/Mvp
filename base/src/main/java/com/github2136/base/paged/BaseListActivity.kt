@@ -18,7 +18,7 @@ abstract class BaseListActivity<T, P : BaseListPresenter<T>> : BaseActivity<P>()
 
     override fun initData(savedInstanceState: Bundle?) {
         mAdapter.setOnItemClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
-        mAdapter.setOnItemLongClickListener { position -> itemClick(mAdapter.getItem(position)!!, position) }
+        mAdapter.setOnItemLongClickListener { position -> itemLongClick(mAdapter.getItem(position)!!, position) }
 
         rvContent.adapter = mAdapter
         mPresenter.list.observe(this, Observer<PagedList<T>> {
