@@ -2,11 +2,12 @@ package com.github2136.mvp.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 import com.github2136.base.BaseActivity
-import com.github2136.base.download.DownLoadUtil
+import com.github2136.base.download.DownloadTask
+import com.github2136.base.download.DownloadUtil
 import com.github2136.mvp.R
 import com.github2136.mvp.presenter.MainPresenter
 import com.github2136.util.FileUtil
@@ -21,17 +22,17 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
         return R.layout.activity_main
     }
 
-    val download by lazy {
-        DownLoadUtil(application)
-    }
+    val download by lazy { DownloadUtil.getInstance(application) }
 
     override fun initData(savedInstanceState: Bundle?) {
         mPresenter.get()
         btn_retry.setOnClickListener(this)
         btn_list.setOnClickListener(this)
         btn_list2.setOnClickListener(this)
-        btn_download.setOnClickListener(this)
-        btn_stop.setOnClickListener(this)
+        btn_download1.setOnClickListener(this)
+        btn_download2.setOnClickListener(this)
+        btn_stop1.setOnClickListener(this)
+        btn_stop2.setOnClickListener(this)
     }
 
     override fun initObserve() {
@@ -55,23 +56,57 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
             R.id.btn_list2 -> {
                 startActivity(Intent(this, DBListActivity::class.java))
             }
-            R.id.btn_download -> {
-
-//                download
-//                        .downloadFile("http://gdown.baidu.com/data/wisegame/df65a597122796a4/weixin_821.apk",
-//                                FileUtil.getExternalStorageRootPath() + File.separator + "a.apk")
+            R.id.btn_download1 -> {
+                download.getPathExists("https://pkg.zhimg.com/zhihu/futureve-app-zhihuwap-ca40fb89fbd4fb3a3884429e1c897fe2-release-5.45.0(1266).apk")
                 download
-                        .downloadFile("http://img1.gamersky.com/image2017/04/20170407_ljt_220_10/gamersky_04origin_07_20174715391B4.jpg",
-                                FileUtil.getExternalStorageRootPath() + File.separator + "000.jpg") { path, progress ->
-//                            download.deletePath("http://img1.gamersky.com/image2017/04/20170407_ljt_220_10/gamersky_04origin_07_20174715391B4.jpg")
+                    .download(
+                        "https://pkg.zhimg.com/zhihu/futureve-app-zhihuwap-ca40fb89fbd4fb3a3884429e1c897fe2-release-5.45.0(1266).apk",
+                        FileUtil.getExternalStorageRootPath() + File.separator + "abc.apk") { state, progress, path ->
+                        when (state) {
+                            DownloadTask.STATE_SUCCESS -> {
+                                Log.e("download1", "success $path")
+                            }
+                            DownloadTask.STATE_FAIL -> {
+                                Log.e("download1", "fail")
+                            }
+                            DownloadTask.STATE_DOWNLOAD -> {
+                                pb1.progress = progress
+                                Log.e("download1", "download $progress")
+                            }
+                            DownloadTask.STATE_STOP -> {
+                                Log.e("download1", "stop")
+                            }
                         }
-//                download
-//                        .downloadFile("https://pic3.zhimg.com/v2-49226022c89d0c3fb7344588aede7fc7_r.jpg",
-//                                FileUtil.getExternalStorageRootPath()+File.separator+"a.jpg")
-
+                    }
             }
-            R.id.btn_stop -> {
-                download.stop = true
+            R.id.btn_stop1 -> {
+                download.stop("https://pkg.zhimg.com/zhihu/futureve-app-zhihuwap-ca40fb89fbd4fb3a3884429e1c897fe2-release-5.45.0(1266).apk")
+            }
+            R.id.btn_download2 -> {
+                download.getPathExists("https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk")
+                download
+                    .download(
+                        "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk",
+                        FileUtil.getExternalStorageRootPath() + File.separator + "def.apk") { state, progress, path ->
+                        when (state) {
+                            DownloadTask.STATE_SUCCESS -> {
+                                Log.e("download2", "success $path")
+                            }
+                            DownloadTask.STATE_FAIL -> {
+                                Log.e("download2", "fail")
+                            }
+                            DownloadTask.STATE_DOWNLOAD -> {
+                                pb2.progress = progress
+                                Log.e("download2", "download $progress")
+                            }
+                            DownloadTask.STATE_STOP -> {
+                                Log.e("download2", "stop")
+                            }
+                        }
+                    }
+            }
+            R.id.btn_stop2 -> {
+                download.stop("https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk")
             }
         }
     }

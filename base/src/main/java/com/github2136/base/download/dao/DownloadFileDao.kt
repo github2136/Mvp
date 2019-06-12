@@ -1,16 +1,18 @@
-package com.github2136.base.download
+package com.github2136.base.download.dao
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import com.github2136.base.download.entity.DownloadFile
 
 /**
  * Created by YB on 2019/6/6
+ * 文件表操作
  */
-class DownLoadDao(context: Context) {
+class DownloadFileDao(context: Context) {
     private val dbHelper = DBHelper(context)
     private val db: SQLiteDatabase = dbHelper.writableDatabase
-    fun install(file: DownLoadFile): Long {
+    fun install(file: DownloadFile): Long {
         db.beginTransaction()
         val id: Long
         try {
@@ -28,7 +30,7 @@ class DownLoadDao(context: Context) {
         return id
     }
 
-    fun update(file: DownLoadFile): Boolean {
+    fun update(file: DownloadFile): Boolean {
         db.beginTransaction()
         val id: Int
         try {
@@ -45,35 +47,35 @@ class DownLoadDao(context: Context) {
         return id > 0
     }
 
-    fun get(id: Long): DownLoadFile? {
-        val cursor = db.query(TAB_NAME, COLS, "$COL_ID = ?", arrayOf(id.toString()), null, null, null)
-        val file: DownLoadFile?
-        if (cursor.moveToFirst()) {
-            val idIndex = cursor.getColumnIndex(COL_ID)
-            val fileUrlIndex = cursor.getColumnIndex(COL_FILE_URL)
-            val filePathIndex = cursor.getColumnIndex(COL_FILE_PATH)
-            val fileSizeIndex = cursor.getColumnIndex(COL_FILE_SIZE)
-            val fileTotalIndex = cursor.getColumnIndex(COL_FILE_TOTAL)
-            val completeIndex = cursor.getColumnIndex(COL_COMPLETE)
+//    fun get(id: Long): DownloadFile? {
+//        val cursor = db.query(TAB_NAME, COLS, "$COL_ID = ?", arrayOf(id.toString()), null, null, null)
+//        val file: DownloadFile?
+//        if (cursor.moveToFirst()) {
+//            val idIndex = cursor.getColumnIndex(COL_ID)
+//            val fileUrlIndex = cursor.getColumnIndex(COL_FILE_URL)
+//            val filePathIndex = cursor.getColumnIndex(COL_FILE_PATH)
+//            val fileSizeIndex = cursor.getColumnIndex(COL_FILE_SIZE)
+//            val fileTotalIndex = cursor.getColumnIndex(COL_FILE_TOTAL)
+//            val completeIndex = cursor.getColumnIndex(COL_COMPLETE)
+//
+//            file = DownloadFile(
+//                    cursor.getLong(idIndex),
+//                    cursor.getString(fileUrlIndex),
+//                    cursor.getString(filePathIndex),
+//                    cursor.getLong(fileSizeIndex),
+//                    cursor.getLong(fileTotalIndex),
+//                    cursor.getInt(completeIndex) == 1
+//            )
+//        } else {
+//            file = null
+//        }
+//        cursor.close()
+//        return file
+//    }
 
-            file = DownLoadFile(
-                    cursor.getLong(idIndex),
-                    cursor.getString(fileUrlIndex),
-                    cursor.getString(filePathIndex),
-                    cursor.getLong(fileSizeIndex),
-                    cursor.getLong(fileTotalIndex),
-                    cursor.getInt(completeIndex) == 1
-            )
-        } else {
-            file = null
-        }
-        cursor.close()
-        return file
-    }
-
-    fun get(fileUrl: String): DownLoadFile? {
+    fun get(fileUrl: String): DownloadFile? {
         val cursor = db.query(TAB_NAME, COLS, "$COL_FILE_URL = ?", arrayOf(fileUrl), null, null, null)
-        val file: DownLoadFile?
+        var file: DownloadFile? = null
         if (cursor.moveToFirst()) {
             val idIndex = cursor.getColumnIndex(COL_ID)
             val fileUrlIndex = cursor.getColumnIndex(COL_FILE_URL)
@@ -82,16 +84,14 @@ class DownLoadDao(context: Context) {
             val fileTotalIndex = cursor.getColumnIndex(COL_FILE_TOTAL)
             val completeIndex = cursor.getColumnIndex(COL_COMPLETE)
 
-            file = DownLoadFile(
-                    cursor.getLong(idIndex),
-                    cursor.getString(fileUrlIndex),
-                    cursor.getString(filePathIndex),
-                    cursor.getLong(fileSizeIndex),
-                    cursor.getLong(fileTotalIndex),
-                    cursor.getInt(completeIndex) == 1
+            file = DownloadFile(
+                cursor.getLong(idIndex),
+                cursor.getString(fileUrlIndex),
+                cursor.getString(filePathIndex),
+                cursor.getLong(fileSizeIndex),
+                cursor.getLong(fileTotalIndex),
+                cursor.getInt(completeIndex) == 1
             )
-        } else {
-            file = null
         }
         cursor.close()
         return file
@@ -101,8 +101,12 @@ class DownLoadDao(context: Context) {
         db.delete(TAB_NAME, "$COL_FILE_URL = ?", arrayOf(fileUrl))
     }
 
+    fun close() {
+        db.close()
+    }
+
     companion object {
-        const val TAB_NAME = "DownLoadFile"
+        const val TAB_NAME = "DownloadFile"
         const val COL_ID = "id"
         const val COL_FILE_URL = "fileUrl"
         const val COL_FILE_PATH = "filePath"
