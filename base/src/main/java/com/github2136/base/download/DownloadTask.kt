@@ -13,7 +13,7 @@ import java.io.*
 /**
  * Created by YB on 2019/6/11
  */
-class DownloadTask(val app: Application, private val url: String, private val filePath: String, val callback: (state: Int, progress: Int, path: String?) -> Unit) {
+class DownloadTask(val app: Application, private val url: String, private val filePath: String, val callback: (state: Int, progress: Int, path: String) -> Unit) {
     private val downLoadFileDao by lazy { DownloadFileDao(app) }
     private val downLoadBlockDao by lazy { DownloadBlockDao(app) }
     private val okHttpManager = OkHttpManager.instance
@@ -30,6 +30,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
     //是否停止
     private var stop = false
     private var downloadFile: DownloadFile? = null
+
     /**
      * 开始下载
      */
@@ -51,8 +52,10 @@ class DownloadTask(val app: Application, private val url: String, private val fi
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 //下载失败
-                state = STATE_FAIL
-                callback.invoke(state, 0, null)
+                if (state != STATE_FAIL) {
+                    state = STATE_FAIL
+                    callback.invoke(STATE_FAIL, 0, "")
+                }
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -91,12 +94,16 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             }
                         } else {
                             //下载失败
-                            state = STATE_FAIL
-                            callback.invoke(state, 0, null)
+                            if (state != STATE_FAIL) {
+                                state = STATE_FAIL
+                                callback.invoke(STATE_FAIL, 0, "")
+                            }
                         }
                     } else {
-                        state = STATE_FAIL
-                        callback.invoke(state, 0, null)
+                        if (state != STATE_FAIL) {
+                            state = STATE_FAIL
+                            callback.invoke(STATE_FAIL, 0, "")
+                        }
                         //下载失败
                         response.body()?.apply {
                             close(this)
@@ -104,8 +111,10 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                     }
                 } catch (e: Exception) {
                     //下载失败
-                    state = STATE_FAIL
-                    callback.invoke(state, 0, null)
+                    if (state != STATE_FAIL) {
+                        state = STATE_FAIL
+                        callback.invoke(STATE_FAIL, 0, "")
+                    }
                 } finally {
                 }
             }
@@ -129,7 +138,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             //开始位置
             val start = i * blockSize
             //结束位置
-            var end = (i+1) * blockSize - 1
+            var end = (i + 1) * blockSize - 1
             if (i == threadSize - 1) {
                 //最后一块
                 end = contentLength - 1
@@ -155,68 +164,79 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     //下载失败
-                    state = STATE_FAIL
-                    callback.invoke(state, 0, null)
+                    if (state != STATE_FAIL) {
+                        state = STATE_FAIL
+                        callback.invoke(STATE_FAIL, 0, "")
+                    }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        var inputStream: InputStream
-                        val buf = ByteArray(2048)
-                        var len = 0
+                    try {
+                        if (response.isSuccessful) {
+                            var inputStream: InputStream
+                            val buf = ByteArray(2048)
+                            var len = 0
 
-                        response.body()?.apply {
+                            response.body()?.apply {
+                                var current = fileBlock.fileSize
+                                inputStream = byteStream()
+                                var time1 = System.currentTimeMillis()
+                                var time2: Long
+                                val randomFile = RandomAccessFile(file, "rw")
+                                //跳过已下载的内容
+                                randomFile.seek(start + current)
+                                while ({ len = inputStream.read(buf);len }() != -1) {
+                                    current += len
+                                    randomFile.write(buf, 0, len)
 
-                            var current = fileBlock.fileSize
-                            inputStream = byteStream()
-                            var time1 = System.currentTimeMillis()
-                            var time2: Long
-                            val randomFile = RandomAccessFile(file, "rw")
-                            //跳过已下载的内容
-                            randomFile.seek(start + current)
-                            while ({ len = inputStream.read(buf);len }() != -1) {
-                                current += len
-                                randomFile.write(buf, 0, len)
-
-                                fileBlock.fileSize = current
-                                if (current == fileBlock.end - fileBlock.start + 1) {
-                                    fileBlock.complete = true
-                                    downLoadBlockDao.update(fileBlock)
+                                    fileBlock.fileSize = current
+                                    if (current == fileBlock.end - fileBlock.start + 1) {
+                                        fileBlock.complete = true
+                                        downLoadBlockDao.update(fileBlock)
+                                    }
+                                    mProgress!![i] = current
+                                    time2 = System.currentTimeMillis()
+                                    if (time2 - time1 > 200) {
+                                        downLoadBlockDao.update(fileBlock)
+                                        time1 = time2
+                                        progress()
+                                    }
+                                    if (stop) {
+                                        //停止下载
+                                        downLoadBlockDao.update(fileBlock)
+                                        break
+                                    }
                                 }
                                 mProgress!![i] = current
-                                time2 = System.currentTimeMillis()
-                                if (time2 - time1 > 200) {
-                                    downLoadBlockDao.update(fileBlock)
-                                    time1 = time2
-                                    progress()
+                                progress()
+                                childFinishCount++
+                                if (childFinishCount == threadSize) {
+                                    if (stop) {
+                                        //停止
+                                        state = STATE_STOP
+                                        callback.invoke(STATE_STOP, 0, "")
+                                    } else {
+                                        //下载完成
+                                        state = STATE_SUCCESS
+                                        callback.invoke(STATE_SUCCESS, 100, file.absolutePath)
+                                    }
                                 }
-                                if (stop) {
-                                    //停止下载
-                                    downLoadBlockDao.update(fileBlock)
-                                    break
-                                }
+                                inputStream.close()
+                                randomFile.close()
                             }
-                            mProgress!![i] = current
-                            progress()
-                            childFinishCount++
-                            if (childFinishCount == threadSize) {
-                                if (stop) {
-                                    //停止
-                                    state = STATE_STOP
-                                    callback.invoke(state, 0, null)
-                                } else {
-                                    //下载完成
-                                    state = STATE_SUCCESS
-                                    callback.invoke(state, 100, file.absolutePath)
-                                }
+                        } else {
+                            //下载失败
+                            if (state != STATE_FAIL) {
+                                state = STATE_FAIL
+                                callback.invoke(STATE_FAIL, 0, "")
                             }
-                            inputStream.close()
-                            randomFile.close()
                         }
-                    } else {
+                    } catch (e: Exception) {
                         //下载失败
-                        state = STATE_FAIL
-                        callback.invoke(state, 0, null)
+                        if (state != STATE_FAIL) {
+                            state = STATE_FAIL
+                            callback.invoke(STATE_FAIL, 0, "")
+                        }
                     }
                 }
             })
@@ -235,7 +255,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             }
             downLoadFileDao.update(this)
         }
-        callback.invoke(state, (progress.toFloat() / length * 100).toInt(), null)
+        callback.invoke(state, (progress.toFloat() / length * 100).toInt(), "")
     }
 
     fun stop() {

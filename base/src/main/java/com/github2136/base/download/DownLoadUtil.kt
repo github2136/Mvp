@@ -35,7 +35,7 @@ class DownloadUtil private constructor(val app: Application) {
         return null
     }
 
-    fun download(url: String, filePath: String, callback: (state: Int, progress: Int, path: String?) -> Unit) {
+    fun download(url: String, filePath: String, callback: (state: Int, progress: Int, path: String) -> Unit) {
         if (!downloadTask.containsKey(url)) {
             val task = DownloadTask(app, url, filePath, callback)
             task.start()
