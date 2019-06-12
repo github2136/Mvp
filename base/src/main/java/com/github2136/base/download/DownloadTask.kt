@@ -66,6 +66,11 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             close(this)
                         }
                         if (length > -1) {
+                            if (!response.header("accept-ranges").equals("bytes")) {
+                                //不允许断点续传，删除之前的下载记录
+                                downLoadFileDao.delete(url)
+                                downLoadBlockDao.delete(url)
+                            }
                             if (downloadFile == null) {
                                 //未下载过
                                 downloadFile = DownloadFile(0, url, filePath, 0, length, false)
@@ -86,8 +91,8 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             val randomFile = RandomAccessFile(file, "rw")
                             randomFile.setLength(length)
                             //分块下载
-                            if (length > 1024) {
-                                //文件超过1K分块下载
+                            if (length > 1024 && response.header("accept-ranges").equals("bytes")) {
+                                //文件超过1K分块下载并且支持断点续传
                                 download(downloadFile!!.id, 5, url, length)
                             } else {
                                 download(downloadFile!!.id, 1, url, length)
