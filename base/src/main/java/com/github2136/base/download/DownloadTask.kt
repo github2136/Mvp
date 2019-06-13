@@ -13,7 +13,7 @@ import java.io.*
 /**
  * Created by YB on 2019/6/11
  */
-class DownloadTask(val app: Application, private val url: String, private val filePath: String, val callback: (state: Int, progress: Int, path: String) -> Unit) {
+class DownloadTask(val app: Application, private val url: String, private val filePath: String, val callback: (state: Int, progress: Int, path: String, url: String) -> Unit) {
     private val downLoadFileDao by lazy { DownloadFileDao(app) }
     private val downLoadBlockDao by lazy { DownloadBlockDao(app) }
     private val okHttpManager = OkHttpManager.instance
@@ -54,7 +54,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                 //下载失败
                 if (state != STATE_FAIL) {
                     state = STATE_FAIL
-                    callback.invoke(STATE_FAIL, 0, "")
+                    callback.invoke(STATE_FAIL, 0, "", url)
                 }
             }
 
@@ -101,13 +101,13 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             //下载失败
                             if (state != STATE_FAIL) {
                                 state = STATE_FAIL
-                                callback.invoke(STATE_FAIL, 0, "")
+                                callback.invoke(STATE_FAIL, 0, "", url)
                             }
                         }
                     } else {
                         if (state != STATE_FAIL) {
                             state = STATE_FAIL
-                            callback.invoke(STATE_FAIL, 0, "")
+                            callback.invoke(STATE_FAIL, 0, "", url)
                         }
                         //下载失败
                         response.body()?.apply {
@@ -118,7 +118,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                     //下载失败
                     if (state != STATE_FAIL) {
                         state = STATE_FAIL
-                        callback.invoke(STATE_FAIL, 0, "")
+                        callback.invoke(STATE_FAIL, 0, "", url)
                     }
                 } finally {
                 }
@@ -171,7 +171,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                     //下载失败
                     if (state != STATE_FAIL) {
                         state = STATE_FAIL
-                        callback.invoke(STATE_FAIL, 0, "")
+                        callback.invoke(STATE_FAIL, 0, "", url)
                     }
                 }
 
@@ -219,11 +219,11 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                                     if (stop) {
                                         //停止
                                         state = STATE_STOP
-                                        callback.invoke(STATE_STOP, 0, "")
+                                        callback.invoke(STATE_STOP, 0, "", url)
                                     } else {
                                         //下载完成
                                         state = STATE_SUCCESS
-                                        callback.invoke(STATE_SUCCESS, 100, file.absolutePath)
+                                        callback.invoke(STATE_SUCCESS, 100, file.absolutePath, url)
                                     }
                                 }
                                 inputStream.close()
@@ -233,14 +233,14 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             //下载失败
                             if (state != STATE_FAIL) {
                                 state = STATE_FAIL
-                                callback.invoke(STATE_FAIL, 0, "")
+                                callback.invoke(STATE_FAIL, 0, "", url)
                             }
                         }
                     } catch (e: Exception) {
                         //下载失败
                         if (state != STATE_FAIL) {
                             state = STATE_FAIL
-                            callback.invoke(STATE_FAIL, 0, "")
+                            callback.invoke(STATE_FAIL, 0, "", url)
                         }
                     }
                 }
@@ -260,7 +260,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             }
             downLoadFileDao.update(this)
         }
-        callback.invoke(state, (progress.toFloat() / length * 100).toInt(), "")
+        callback.invoke(state, (progress.toFloat() / length * 100).toInt(), "", url)
     }
 
     fun stop() {

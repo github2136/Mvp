@@ -3,7 +3,7 @@ package com.github2136.base.download
 import android.app.Application
 import com.github2136.base.download.dao.DownloadBlockDao
 import com.github2136.base.download.dao.DownloadFileDao
-import java.io.*
+import java.io.File
 
 /**
  * Created by YB on 2019/6/6
@@ -37,7 +37,14 @@ class DownloadUtil private constructor(val app: Application) {
 
     fun download(url: String, filePath: String, callback: (state: Int, progress: Int, path: String) -> Unit) {
         if (!downloadTask.containsKey(url)) {
-            val task = DownloadTask(app, url, filePath, callback)
+            fun callback(state: Int, progress: Int, path: String, url: String) {
+                if (state != DownloadTask.STATE_DOWNLOAD) {
+                    downloadTask.remove(url)
+                }
+                callback(state, progress, path)
+            }
+
+            val task = DownloadTask(app, url, filePath, ::callback)
             task.start()
             downloadTask[url] = task
         } else {
@@ -50,6 +57,7 @@ class DownloadUtil private constructor(val app: Application) {
             }
         }
     }
+
 
     fun stop(url: String) {
         if (downloadTask.containsKey(url)) {
