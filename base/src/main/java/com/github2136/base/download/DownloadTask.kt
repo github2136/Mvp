@@ -9,6 +9,7 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.*
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by YB on 2019/6/11
@@ -24,7 +25,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
     //文件总长度
     private var length: Long = 0
     //下载完成的块
-    private var childFinishCount: Int = 0
+    private var childFinishCount: AtomicInteger = AtomicInteger()
     //当前状态
     var state: Int = 0
     //是否停止
@@ -36,7 +37,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
      */
     fun start() {
         stop = false
-        childFinishCount = 0
+        childFinishCount = AtomicInteger()
         state = STATE_DOWNLOAD
         downloadFile = downLoadFileDao.get(url)
         downloadFile?.apply {
@@ -66,7 +67,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             close(this)
                         }
                         if (length > -1) {
-                            if (!response.header("accept-ranges").equals("bytes")) {
+                            if (response.header("accept-ranges").equals("none")) {
                                 //不允许断点续传，删除之前的下载记录
                                 downLoadFileDao.delete(url)
                                 downLoadBlockDao.delete(url)
@@ -91,7 +92,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             val randomFile = RandomAccessFile(file, "rw")
                             randomFile.setLength(length)
                             //分块下载
-                            if (length > 1024 && response.header("accept-ranges").equals("bytes")) {
+                            if (length > 1024 && !response.header("accept-ranges").equals("none")) {
                                 //文件超过1K分块下载并且支持断点续传
                                 download(downloadFile!!.id, 5, url, length)
                             } else {
@@ -160,7 +161,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             }
             if (fileBlock.complete) {
                 //表示该块下载完成
-                childFinishCount++
+                childFinishCount.incrementAndGet()
                 mProgress!![i] = fileBlock.fileSize
                 continue
             }
@@ -214,8 +215,8 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                                 }
                                 mProgress!![i] = current
                                 progress()
-                                childFinishCount++
-                                if (childFinishCount == threadSize) {
+                                childFinishCount.incrementAndGet()
+                                if (childFinishCount.get() == threadSize) {
                                     if (stop) {
                                         //停止
                                         state = STATE_STOP
