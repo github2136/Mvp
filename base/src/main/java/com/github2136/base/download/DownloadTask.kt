@@ -9,7 +9,6 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.*
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Created by YB on 2019/6/11
@@ -25,7 +24,8 @@ class DownloadTask(val app: Application, private val url: String, private val fi
     //文件总长度
     private var length: Long = 0
     //下载完成的块
-    private var childFinishCount: AtomicInteger = AtomicInteger()
+    @Volatile
+    private var childFinishCount: Int = 0
     //当前状态
     var state: Int = 0
     //是否停止
@@ -37,7 +37,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
      */
     fun start() {
         stop = false
-        childFinishCount = AtomicInteger()
+        childFinishCount = 0
         state = STATE_DOWNLOAD
         downloadFile = downLoadFileDao.get(url)
         downloadFile?.apply {
@@ -161,7 +161,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             }
             if (fileBlock.complete) {
                 //表示该块下载完成
-                childFinishCount.incrementAndGet()
+                childFinish()
                 mProgress!![i] = fileBlock.fileSize
                 continue
             }
@@ -215,8 +215,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                                 }
                                 mProgress!![i] = current
                                 progress()
-                                childFinishCount.incrementAndGet()
-                                if (childFinishCount.get() == threadSize) {
+                                if (childFinish() == threadSize) {
                                     if (stop) {
                                         //停止
                                         state = STATE_STOP
@@ -247,6 +246,12 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                 }
             })
         }
+    }
+
+    @Synchronized
+    fun childFinish(): Int {
+        childFinishCount++
+        return childFinishCount
     }
 
     fun progress() {
