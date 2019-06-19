@@ -53,10 +53,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 //下载失败
-                if (state != STATE_FAIL) {
-                    state = STATE_FAIL
-                    callback.invoke(STATE_FAIL, 0, "", url)
-                }
+                fail()
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -100,16 +97,10 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             }
                         } else {
                             //下载失败
-                            if (state != STATE_FAIL) {
-                                state = STATE_FAIL
-                                callback.invoke(STATE_FAIL, 0, "", url)
-                            }
+                            fail()
                         }
                     } else {
-                        if (state != STATE_FAIL) {
-                            state = STATE_FAIL
-                            callback.invoke(STATE_FAIL, 0, "", url)
-                        }
+                        fail()
                         //下载失败
                         response.body()?.apply {
                             close(this)
@@ -117,10 +108,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                     }
                 } catch (e: Exception) {
                     //下载失败
-                    if (state != STATE_FAIL) {
-                        state = STATE_FAIL
-                        callback.invoke(STATE_FAIL, 0, "", url)
-                    }
+                    fail()
                 } finally {
                 }
             }
@@ -170,10 +158,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     //下载失败
-                    if (state != STATE_FAIL) {
-                        state = STATE_FAIL
-                        callback.invoke(STATE_FAIL, 0, "", url)
-                    }
+                    fail()
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -215,7 +200,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                                 }
                                 mProgress!![i] = current
                                 progress()
-                                if (childFinish() == threadSize) {
+                                if (childFinish() == threadSize && state == STATE_DOWNLOAD) {
                                     if (stop) {
                                         //停止
                                         state = STATE_STOP
@@ -231,17 +216,11 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             }
                         } else {
                             //下载失败
-                            if (state != STATE_FAIL) {
-                                state = STATE_FAIL
-                                callback.invoke(STATE_FAIL, 0, "", url)
-                            }
+                            fail()
                         }
                     } catch (e: Exception) {
                         //下载失败
-                        if (state != STATE_FAIL) {
-                            state = STATE_FAIL
-                            callback.invoke(STATE_FAIL, 0, "", url)
-                        }
+                        fail()
                     }
                 }
             })
@@ -271,6 +250,14 @@ class DownloadTask(val app: Application, private val url: String, private val fi
 
     fun stop() {
         stop = true
+    }
+
+    private fun fail() {
+        if (state != STATE_FAIL) {
+            state = STATE_FAIL
+            stop = true
+            callback.invoke(STATE_FAIL, 0, "", url)
+        }
     }
 
     /**
