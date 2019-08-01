@@ -1,14 +1,17 @@
 package com.github2136.base
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Message
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
@@ -23,7 +26,11 @@ abstract class BaseFragment<P : BasePresenter> : Fragment() {
     protected lateinit var mContext: Context
     protected val mHandler by lazy { Handler(this) }
     protected var mToast: Toast? = null
-
+    protected val mDialog: ProgressDialog by lazy {
+        val dialog = ProgressDialog(activity)
+        dialog.setCancelable(false)
+        dialog
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -54,6 +61,7 @@ abstract class BaseFragment<P : BasePresenter> : Fragment() {
         } else {
             getPresenter(type[0] as Class<P>)
         }
+        mPresenter.ldDialog.observe(this, Observer { str -> showDialog(str) })
         initObserve()
         initData(savedInstanceState)
     }
@@ -125,6 +133,19 @@ abstract class BaseFragment<P : BasePresenter> : Fragment() {
             it.setText(resId)
             it.duration = Toast.LENGTH_LONG
             it.show()
+        }
+    }
+
+    open fun showDialog(msg: String?) {
+        if (!TextUtils.isEmpty(msg)) {
+            mDialog.setMessage(msg)
+            if (isAdded && !isDetached) {
+                mDialog.show()
+            }
+        } else {
+            if (mDialog.isShowing) {
+                mDialog.dismiss()
+            }
         }
     }
 

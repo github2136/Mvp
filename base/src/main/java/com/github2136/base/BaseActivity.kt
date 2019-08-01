@@ -15,7 +15,6 @@ import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
 import java.lang.reflect.ParameterizedType
 
-
 /**
  * Created by yb on 2018/11/2.
  */
