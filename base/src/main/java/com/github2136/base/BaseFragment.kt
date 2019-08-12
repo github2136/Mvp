@@ -39,6 +39,7 @@ abstract class BaseFragment<P : BasePresenter> : Fragment() {
 
     private fun attach(context: Context) {
         mContext = context
+        mToast = Toast.makeText(mContext , "", Toast.LENGTH_SHORT)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
