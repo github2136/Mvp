@@ -13,7 +13,7 @@ import java.io.*
 /**
  * Created by YB on 2019/6/11
  */
-class DownloadTask(val app: Application, private val url: String, private val filePath: String, val callback: (state: Int, progress: Int, path: String, url: String) -> Unit) {
+class DownloadTask(val app: Application, private val url: String, private val filePath: String, val callback: (state: Int, progress: Int, path: String, url: String, error: String?) -> Unit) {
     private val downLoadFileDao by lazy { DownloadFileDao(app) }
     private val downLoadBlockDao by lazy { DownloadBlockDao(app) }
     private val okHttpManager = OkHttpManager.instance
@@ -53,7 +53,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
         call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 //下载失败
-                fail()
+                fail("start onFailure ${e.stackTrace}")
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -64,7 +64,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             close(this)
                         }
                         if (length > -1) {
-                            if (response.header("accept-ranges").equals("none")) {
+                            if (response.header("accept-ranges") == "none") {
                                 //不允许断点续传，删除之前的下载记录
                                 downLoadFileDao.delete(url)
                                 downLoadBlockDao.delete(url)
@@ -89,7 +89,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             val randomFile = RandomAccessFile(file, "rw")
                             randomFile.setLength(length)
                             //分块下载
-                            if (length > 1024 && !response.header("accept-ranges").equals("none")) {
+                            if (length > 1024 && response.header("accept-ranges") != "none") {
                                 //文件超过1K分块下载并且支持断点续传
                                 download(downloadFile!!.id, 5, url, length)
                             } else {
@@ -97,10 +97,10 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                             }
                         } else {
                             //下载失败
-                            fail()
+                            fail("file size < 0")
                         }
                     } else {
-                        fail()
+                        fail("request code ${response.code()}")
                         //下载失败
                         response.body()?.apply {
                             close(this)
@@ -108,8 +108,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                     }
                 } catch (e: Exception) {
                     //下载失败
-                    fail()
-                } finally {
+                    fail(e.stackTrace.toString())
                 }
             }
         })
@@ -158,27 +157,27 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     //下载失败
-                    fail()
+                    fail("download onFailure ${e.stackTrace}")
                 }
 
                 override fun onResponse(call: Call, response: Response) {
+                    var inputStream: InputStream? = null
+                    var randomFile: RandomAccessFile? = null
                     try {
                         if (response.isSuccessful) {
-                            var inputStream: InputStream
                             val buf = ByteArray(2048)
                             var len = 0
-
                             response.body()?.apply {
                                 var current = fileBlock.fileSize
                                 inputStream = byteStream()
                                 var time1 = System.currentTimeMillis()
                                 var time2: Long
-                                val randomFile = RandomAccessFile(file, "rw")
+                                randomFile = RandomAccessFile(file, "rw")
                                 //跳过已下载的内容
-                                randomFile.seek(start + current)
-                                while ({ len = inputStream.read(buf);len }() != -1) {
+                                randomFile!!.seek(start + current)
+                                while ({ len = inputStream!!.read(buf);len }() != -1) {
                                     current += len
-                                    randomFile.write(buf, 0, len)
+                                    randomFile!!.write(buf, 0, len)
 
                                     fileBlock.fileSize = current
                                     if (current == fileBlock.end - fileBlock.start + 1) {
@@ -204,23 +203,27 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                                     if (stop) {
                                         //停止
                                         state = STATE_STOP
-                                        callback.invoke(STATE_STOP, 0, "", url)
+                                        callback.invoke(STATE_STOP, 0, "", url, null)
                                     } else {
                                         //下载完成
                                         state = STATE_SUCCESS
-                                        callback.invoke(STATE_SUCCESS, 100, file.absolutePath, url)
+                                        callback.invoke(STATE_SUCCESS, 100, file.absolutePath, url, null)
                                     }
                                 }
-                                inputStream.close()
-                                randomFile.close()
+
                             }
                         } else {
                             //下载失败
-                            fail()
+                            fail("request code ${response.code()}")
                         }
                     } catch (e: Exception) {
                         //下载失败
-                        fail()
+                        val w = StringWriter()
+                        e.printStackTrace(PrintWriter(w))
+                        fail(w.toString())
+                    } finally {
+                        inputStream?.close()
+                        randomFile?.close()
                     }
                 }
             })
@@ -245,18 +248,18 @@ class DownloadTask(val app: Application, private val url: String, private val fi
             }
             downLoadFileDao.update(this)
         }
-        callback.invoke(state, (progress.toFloat() / length * 100).toInt(), "", url)
+        callback.invoke(state, (progress.toFloat() / length * 100).toInt(), "", url, null)
     }
 
     fun stop() {
         stop = true
     }
 
-    private fun fail() {
+    private fun fail(error: String) {
         if (state != STATE_FAIL) {
             state = STATE_FAIL
             stop = true
-            callback.invoke(STATE_FAIL, 0, "", url)
+            callback.invoke(STATE_FAIL, 0, "", url, error)
         }
     }
 

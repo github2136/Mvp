@@ -45,6 +45,10 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
         })
     }
 
+    val downStr1 = "http://125.124.92.69/upload/app/fireservicesunit.apk"
+    //    val downStr1="https://dldir1.qq.com/music/clntupate/QQMusic_YQQFloatLayer.exe"
+    val downStr2 = "https://d1.music.126.net/dmusic/4ec1/201978183952/cloudmusicsetup2.5.5.197810.exe"
+
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_retry -> {
@@ -57,17 +61,18 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
                 startActivity(Intent(this, DBListActivity::class.java))
             }
             R.id.btn_download1 -> {
-                download.getPathExists("https://pkg.zhimg.com/zhihu/futureve-app-zhihuwap-ca40fb89fbd4fb3a3884429e1c897fe2-release-5.45.0(1266).apk")
+
+                download.getPathExists(downStr1)
                 download
                     .download(
-                        "https://pkg.zhimg.com/zhihu/futureve-app-zhihuwap-ca40fb89fbd4fb3a3884429e1c897fe2-release-5.45.0(1266).apk",
-                        FileUtil.getExternalStorageRootPath() + File.separator + "abc.apk") { state, progress, path ->
+                        downStr1,
+                        FileUtil.getExternalStorageRootPath() + File.separator + "abc.exe") { state, progress, path, error ->
                         when (state) {
                             DownloadTask.STATE_SUCCESS -> {
                                 Log.e("download1", "success $path")
                             }
                             DownloadTask.STATE_FAIL -> {
-                                Log.e("download1", "fail")
+                                Log.e("download1", "fail $error")
                             }
                             DownloadTask.STATE_DOWNLOAD -> {
                                 pb1.progress = progress
@@ -80,20 +85,20 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
                     }
             }
             R.id.btn_stop1 -> {
-                download.stop("https://pkg.zhimg.com/zhihu/futureve-app-zhihuwap-ca40fb89fbd4fb3a3884429e1c897fe2-release-5.45.0(1266).apk")
+                download.stop(downStr1)
             }
             R.id.btn_download2 -> {
-                download.getPathExists("https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk")
+                download.getPathExists(downStr2)
                 download
                     .download(
-                        "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk",
-                        FileUtil.getExternalStorageRootPath() + File.separator + "def.apk") { state, progress, path ->
+                        downStr2,
+                        FileUtil.getExternalStorageRootPath() + File.separator + "def.exe") { state, progress, path, error ->
                         when (state) {
                             DownloadTask.STATE_SUCCESS -> {
                                 Log.e("download2", "success $path")
                             }
                             DownloadTask.STATE_FAIL -> {
-                                Log.e("download2", "fail")
+                                Log.e("download1", "fail $error")
                             }
                             DownloadTask.STATE_DOWNLOAD -> {
                                 pb2.progress = progress
@@ -106,7 +111,7 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
                     }
             }
             R.id.btn_stop2 -> {
-                download.stop("https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk")
+                download.stop(downStr2)
             }
         }
     }

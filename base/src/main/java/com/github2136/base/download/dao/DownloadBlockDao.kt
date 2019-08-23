@@ -10,7 +10,7 @@ import com.github2136.base.download.entity.DownloadBlock
  * 文件块操作
  */
 class DownloadBlockDao(context: Context) {
-    private val dbHelper = DBHelper(context)
+    private val dbHelper by lazy { DBHelper.getInstance(context) }
     private val db: SQLiteDatabase = dbHelper.writableDatabase
 
     fun install(file: DownloadBlock): Long {

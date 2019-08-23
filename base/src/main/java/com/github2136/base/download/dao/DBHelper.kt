@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 /**
  * Created by YB on 2019/6/6
  */
-class DBHelper(context: Context) : SQLiteOpenHelper(context, "DownloadDB.db", null, 1) {
+class DBHelper private constructor(context: Context) : SQLiteOpenHelper(context, "DownloadDB.db", null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
         db?.apply {
             execSQL("CREATE TABLE IF NOT EXISTS " +
@@ -36,6 +36,22 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "DownloadDB.db", nu
             execSQL("DROP TABLE ${DownloadFileDao.TAB_NAME}")
             execSQL("DROP TABLE ${DownloadBlockDao.TAB_NAME}")
             onCreate(this)
+        }
+    }
+
+    companion object {
+        @Volatile
+        private var instance: DBHelper? = null
+
+        fun getInstance(context: Context): DBHelper {
+            if (instance == null) {
+                synchronized(DBHelper::class) {
+                    if (instance == null) {
+                        instance = DBHelper(context)
+                    }
+                }
+            }
+            return instance!!
         }
     }
 }

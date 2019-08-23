@@ -1,6 +1,7 @@
 package com.github2136.base.download
 
 import android.app.Application
+import android.util.Log
 import com.github2136.base.download.dao.DownloadBlockDao
 import com.github2136.base.download.dao.DownloadFileDao
 import java.io.File
@@ -14,7 +15,7 @@ import java.io.File
 class DownloadUtil private constructor(val app: Application) {
     private val downLoadFileDao by lazy { DownloadFileDao(app) }
     private val downLoadBlockDao by lazy { DownloadBlockDao(app) }
-    private val downloadTask = mutableMapOf<String, DownloadTask>()
+    private val downloadTask = mutableMapOf<String, DownloadTaskHttp>()
 
     /**
      * 根据下载地址获取本地存储地址且文件必须存在，如果为null则表示没有下载或下载未完成
@@ -35,16 +36,16 @@ class DownloadUtil private constructor(val app: Application) {
         return null
     }
 
-    fun download(url: String, filePath: String, callback: (state: Int, progress: Int, path: String) -> Unit) {
+    fun download(url: String, filePath: String, callback: (state: Int, progress: Int, path: String, error: String?) -> Unit) {
         if (!downloadTask.containsKey(url)) {
-            fun callback(state: Int, progress: Int, path: String, url: String) {
+            fun callback(state: Int, progress: Int, path: String, url: String, error: String?) {
                 if (state != DownloadTask.STATE_DOWNLOAD) {
                     downloadTask.remove(url)
                 }
-                callback(state, progress, path)
+                callback(state, progress, path, error)
             }
-
-            val task = DownloadTask(app, url, filePath, ::callback)
+            Log.e("download", "download")
+            val task = DownloadTaskHttp(app, url, filePath, ::callback)
             task.start()
             downloadTask[url] = task
         } else {
