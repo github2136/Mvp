@@ -1,6 +1,7 @@
 package com.github2136.base
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import androidx.collection.ArrayMap
@@ -30,7 +31,7 @@ open class BaseModel(app: Application, tag: String) {
     protected var mApp: Application = app
 
     protected var mTag: String = tag
-    protected var mSpUtil: SPUtil = SPUtil.getInstance(mApp)
+    protected var mSpUtil: SharedPreferences = SPUtil.getSharedPreferences(mApp)
     protected var mJsonUtil: JsonUtil = JsonUtil.instance
 
     protected fun httpGet(url: String,

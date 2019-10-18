@@ -1,9 +1,11 @@
 package com.github2136.mvp.ui.activity
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.collection.ArrayMap
 import androidx.lifecycle.Observer
 import com.github2136.base.BaseActivity
 import com.github2136.base.download.DownloadTask
@@ -11,6 +13,7 @@ import com.github2136.base.download.DownloadUtil
 import com.github2136.mvp.R
 import com.github2136.mvp.presenter.MainPresenter
 import com.github2136.util.FileUtil
+import com.github2136.util.PermissionUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 
@@ -18,10 +21,9 @@ import java.io.File
  * Created by yb on 2018/11/2.
  */
 class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
-    override fun getLayoutId(): Int {
-        return R.layout.activity_main
-    }
+    override fun getLayoutId()=R.layout.activity_main
 
+    private val permissionUtil by lazy { PermissionUtil(this) }
     val download by lazy { DownloadUtil.getInstance(application) }
 
     override fun initData(savedInstanceState: Bundle?) {
@@ -33,6 +35,11 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
         btn_download2.setOnClickListener(this)
         btn_stop1.setOnClickListener(this)
         btn_stop2.setOnClickListener(this)
+        val permission = ArrayMap<String, String>()
+        permission[Manifest.permission.WRITE_EXTERNAL_STORAGE] = "文件写入"
+        permissionUtil.getPermission(permission) {
+
+        }
     }
 
     override fun initObserve() {
@@ -68,17 +75,17 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
                         downStr1,
                         FileUtil.getExternalStorageRootPath() + File.separator + "abc.exe") { state, progress, path, error ->
                         when (state) {
-                            DownloadTask.STATE_SUCCESS -> {
+                            DownloadUtil.STATE_SUCCESS -> {
                                 Log.e("download1", "success $path")
                             }
-                            DownloadTask.STATE_FAIL -> {
+                            DownloadUtil.STATE_FAIL -> {
                                 Log.e("download1", "fail $error")
                             }
-                            DownloadTask.STATE_DOWNLOAD -> {
+                            DownloadUtil.STATE_DOWNLOAD -> {
                                 pb1.progress = progress
                                 Log.e("download1", "download $progress")
                             }
-                            DownloadTask.STATE_STOP -> {
+                            DownloadUtil.STATE_STOP -> {
                                 Log.e("download1", "stop")
                             }
                         }
@@ -94,17 +101,17 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
                         downStr2,
                         FileUtil.getExternalStorageRootPath() + File.separator + "def.exe") { state, progress, path, error ->
                         when (state) {
-                            DownloadTask.STATE_SUCCESS -> {
+                            DownloadUtil.STATE_SUCCESS -> {
                                 Log.e("download2", "success $path")
                             }
-                            DownloadTask.STATE_FAIL -> {
+                            DownloadUtil.STATE_FAIL -> {
                                 Log.e("download1", "fail $error")
                             }
-                            DownloadTask.STATE_DOWNLOAD -> {
+                            DownloadUtil.STATE_DOWNLOAD -> {
                                 pb2.progress = progress
                                 Log.e("download2", "download $progress")
                             }
-                            DownloadTask.STATE_STOP -> {
+                            DownloadUtil.STATE_STOP -> {
                                 Log.e("download2", "stop")
                             }
                         }
@@ -114,5 +121,15 @@ class MainActivity : BaseActivity<MainPresenter>(), View.OnClickListener {
                 download.stop(downStr2)
             }
         }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        permissionUtil.onRestart()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionUtil.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

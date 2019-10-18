@@ -38,7 +38,7 @@ class DownloadTask(val app: Application, private val url: String, private val fi
     fun start() {
         stop = false
         childFinishCount = 0
-        state = STATE_DOWNLOAD
+        state = DownloadUtil.STATE_DOWNLOAD
         downloadFile = downLoadFileDao.get(url)
         downloadFile?.apply {
             if (complete) {
@@ -199,15 +199,15 @@ class DownloadTask(val app: Application, private val url: String, private val fi
                                 }
                                 mProgress!![i] = current
                                 progress()
-                                if (childFinish() == threadSize && state == STATE_DOWNLOAD) {
+                                if (childFinish() == threadSize && state == DownloadUtil.STATE_DOWNLOAD) {
                                     if (stop) {
                                         //停止
-                                        state = STATE_STOP
-                                        callback.invoke(STATE_STOP, 0, "", url, null)
+                                        state = DownloadUtil.STATE_STOP
+                                        callback.invoke(DownloadUtil.STATE_STOP, 0, "", url, null)
                                     } else {
                                         //下载完成
-                                        state = STATE_SUCCESS
-                                        callback.invoke(STATE_SUCCESS, 100, file.absolutePath, url, null)
+                                        state = DownloadUtil.STATE_SUCCESS
+                                        callback.invoke(DownloadUtil.STATE_SUCCESS, 100, file.absolutePath, url, null)
                                     }
                                 }
 
@@ -256,10 +256,10 @@ class DownloadTask(val app: Application, private val url: String, private val fi
     }
 
     private fun fail(error: String) {
-        if (state != STATE_FAIL) {
-            state = STATE_FAIL
+        if (state != DownloadUtil.STATE_FAIL) {
+            state = DownloadUtil.STATE_FAIL
             stop = true
-            callback.invoke(STATE_FAIL, 0, "", url, error)
+            callback.invoke(DownloadUtil.STATE_FAIL, 0, "", url, error)
         }
     }
 
@@ -274,13 +274,5 @@ class DownloadTask(val app: Application, private val url: String, private val fi
         } catch (e: IOException) {
             e.printStackTrace()
         }
-    }
-
-    companion object {
-        const val STATE_DOWNLOAD = 1//下载中
-        const val STATE_FAIL = 2//下载失败
-        const val STATE_SUCCESS = 3//下载成功
-        const val STATE_STOP = 4//下载停止
-
     }
 }

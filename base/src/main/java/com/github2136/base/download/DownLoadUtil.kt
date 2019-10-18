@@ -39,7 +39,7 @@ class DownloadUtil private constructor(val app: Application) {
     fun download(url: String, filePath: String, callback: (state: Int, progress: Int, path: String, error: String?) -> Unit) {
         if (!downloadTask.containsKey(url)) {
             fun callback(state: Int, progress: Int, path: String, url: String, error: String?) {
-                if (state != DownloadTask.STATE_DOWNLOAD) {
+                if (state != DownloadUtil.STATE_DOWNLOAD) {
                     downloadTask.remove(url)
                 }
                 callback(state, progress, path, error)
@@ -51,7 +51,7 @@ class DownloadUtil private constructor(val app: Application) {
         } else {
             val task = downloadTask[url]
             task?.apply {
-                if (state != DownloadTask.STATE_DOWNLOAD) {
+                if (state != DownloadUtil.STATE_DOWNLOAD) {
                     //非下载中则下载
                     start()
                 }
@@ -74,6 +74,10 @@ class DownloadUtil private constructor(val app: Application) {
 
 
     companion object {
+        const val STATE_DOWNLOAD = 1//下载中
+        const val STATE_FAIL = 2//下载失败
+        const val STATE_SUCCESS = 3//下载成功
+        const val STATE_STOP = 4//下载停止
         private var instance: DownloadUtil? = null
         fun getInstance(app: Application): DownloadUtil {
             if (instance == null) {
