@@ -3,6 +3,7 @@ package com.github2136.base
 import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -153,7 +154,7 @@ abstract class BaseFragment<P : BasePresenter> : Fragment() {
     ///////////////////////////////////////////////////////////////////////////
     // Handler
     ///////////////////////////////////////////////////////////////////////////
-    class Handler(fragment: BaseFragment<*>) : android.os.Handler() {
+    class Handler(fragment: BaseFragment<*>) : android.os.Handler(Looper.getMainLooper()) {
         var weakReference: WeakReference<BaseFragment<*>> = WeakReference(fragment)
 
         override fun handleMessage(msg: Message) {

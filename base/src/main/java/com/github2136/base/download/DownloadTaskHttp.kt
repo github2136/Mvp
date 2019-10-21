@@ -56,7 +56,7 @@ class DownloadTaskHttp(val app: Application, private val url: String, private va
                 if (code in 200..299) {
                     length = conn.contentLength.toLong()
                     if (length > -1) {
-                        if (conn.getHeaderField("accept-ranges") == "none") {
+                        if (conn.getHeaderField("accept-ranges") != "bytes") {
                             //不允许断点续传，删除之前的下载记录
                             downLoadFileDao.delete(url)
                             downLoadBlockDao.delete(url)
@@ -81,7 +81,7 @@ class DownloadTaskHttp(val app: Application, private val url: String, private va
                         randomFile = RandomAccessFile(file, "rw")
                         randomFile.setLength(length)
                         //分块下载
-                        if (length > 1024 && conn.getHeaderField("accept-ranges") != "none") {
+                        if (length > 1024 && conn.getHeaderField("accept-ranges") == "bytes") {
                             //文件超过1K分块下载并且支持断点续传
                             download(downloadFile!!.id, 5, url, length)
                         } else {

@@ -3,6 +3,7 @@ package com.github2136.base
 import android.app.ProgressDialog
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
 import android.view.View
@@ -63,7 +64,7 @@ abstract class BaseActivity<P : BasePresenter> : AppCompatActivity() {
     ///////////////////////////////////////////////////////////////////////////
     // Handler
     ///////////////////////////////////////////////////////////////////////////
-    class Handler(activity: BaseActivity<*>) : android.os.Handler() {
+    class Handler(activity: BaseActivity<*>) : android.os.Handler(Looper.getMainLooper()) {
         private var weakReference: WeakReference<BaseActivity<*>> = WeakReference(activity)
 
         override fun handleMessage(msg: Message) {
